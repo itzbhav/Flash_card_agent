@@ -113,8 +113,22 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
         
         # JUDGE + REVISE LOOP
         for i in range(3):  # MAX_REVISIONS = 3
+            if harness and getattr(harness, "logger", None):
+                harness.logger.actor_draft(iteration=i, concept=concept, front=draft["front"], back=draft["back"], revision=i)
+
             eval_res = handle_judge_flashcard(draft["front"], draft["back"], concept, source, harness=harness)
             
+            if harness and getattr(harness, "logger", None):
+                harness.logger.judge_eval(
+                    iteration=i, concept=concept,
+                    scores={
+                        "accuracy": eval_res["accuracy"], "relevance": eval_res["relevance"],
+                        "clarity": eval_res["clarity"], "atomicity/conciseness": eval_res["conciseness"]
+                    },
+                    feedback=eval_res["feedback"],
+                    passed=eval_res["pass"]
+                )
+
             # Store version history with judge evaluation
             version_record = {
                 "draft": draft.copy(),
@@ -142,6 +156,7 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
                 break
                 
             # ACTOR REVISION
+            prev_front = draft["front"]
             rev_user = (f"CURRENT FRONT: {draft['front']}\nCURRENT BACK: {draft['back']}\n\n"
                         f"CRITIQUE TO ADDRESS:\n{judge_feedback}\n\nProduce the improved card.")
             rev_data = _llm_json(_REVISE_SYS, rev_user, max_tokens=500, harness=harness)
@@ -149,6 +164,9 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
             draft["back"] = rev_data.get("back", draft["back"])
             draft["difficulty"] = rev_data.get("difficulty", draft.get("difficulty", "medium"))
             revision_count += 1
+
+            if harness and getattr(harness, "logger", None):
+                harness.logger.revision_step(iteration=i, concept=concept, revision=revision_count, prev_front=prev_front, new_front=draft["front"])
             
         # Fallback to the best scoring version if threshold wasn't reached
         if not best_judge_result.get("pass", False) and revision_count == 3:

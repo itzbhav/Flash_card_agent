@@ -95,6 +95,50 @@ class StructuredLogger:
             print(f"  Duration      : {duration_s:.1f}s")
             print(f"{'=' * 60}")
 
+    def actor_draft(self, iteration: int, concept: str, front: str, back: str, revision: int = 0) -> None:
+        """Log an explicit Actor draft generation step."""
+        self._write({
+            "kind": "actor_output",
+            "role": "actor",
+            "iteration": iteration,
+            "concept": concept,
+            "front": front,
+            "back": back,
+            "revision": revision
+        })
+        if self.verbose:
+            print(f"  [Actor] Draft (rev {revision}): concept='{concept}' | front='{front[:40]}...'")
+
+    def judge_eval(self, iteration: int, concept: str, scores: dict, feedback: str, passed: bool, rubric: list[str] | None = None) -> None:
+        """Log an explicit Judge evaluation step against a named rubric."""
+        self._write({
+            "kind": "judge_output",
+            "role": "judge",
+            "iteration": iteration,
+            "concept": concept,
+            "scores": scores,
+            "rubric": rubric or ["Accuracy", "Clarity", "Atomicity"],
+            "feedback": feedback,
+            "passed": passed
+        })
+        if self.verbose:
+            verdict = "PASS" if passed else "REVISE"
+            print(f"  [Judge] Verdict: {verdict} | Scores: {scores} | Feedback: {feedback[:50]}...")
+
+    def revision_step(self, iteration: int, concept: str, revision: int, prev_front: str, new_front: str) -> None:
+        """Log a revision transition step taking judge feedback into account."""
+        self._write({
+            "kind": "revision_applied",
+            "role": "actor",
+            "iteration": iteration,
+            "concept": concept,
+            "revision": revision,
+            "prev_front": prev_front,
+            "new_front": new_front
+        })
+        if self.verbose:
+            print(f"  [Revision] Applied rev #{revision} for '{concept}'")
+
     @contextlib.contextmanager
     def step(self, step_name: str, iteration: int, inputs=None):
         """Wrap one Perceive/Reason/Act/Reflect call.

@@ -1672,5 +1672,158 @@
     "front": "(reflection note)",
     "back": "The agent is doing well in refining the flashcards, but it's essential to ensure all cards are reviewed to solidify the knowledge. Next, review the remaining cards to confirm their quality.",
     "created_at": "2026-08-13 22:26:28"
+  },
+  {
+    "id": "2601e34a",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has started strong by extracting 5 new concepts from the first chunk, but it's essential to continue processing the remaining chunks to achieve full material coverage.",
+    "created_at": "2026-08-13 22:49:05"
+  },
+  {
+    "id": "313df7a4",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Drain pending concepts by generating flashcards before extracting key concepts, and then try again.",
+    "created_at": "2026-08-13 22:49:25"
+  },
+  {
+    "id": "9c71e047",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "Photosynthesis occurs in chloroplasts.",
+    "front": "Where does photosynthesis primarily occur, involving chloroplasts and the green pigment chlorophyll?",
+    "back": "In chloroplasts using the green pigment chlorophyll.",
+    "created_at": "2026-08-13 22:50:02"
+  },
+  {
+    "id": "248a3db7",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Material coverage is at 0%, and only 1 card has been generated so far. Continue generating flashcards to cover all material chunks.",
+    "created_at": "2026-08-13 22:50:02"
+  },
+  {
+    "id": "46b3d6c4",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "Chlorophyll is the green pigment used in photosynthesis.",
+    "front": "What is the primary pigment used in photosynthesis?",
+    "back": "Chlorophyll, a green pigment.",
+    "created_at": "2026-08-13 22:50:29"
+  },
+  {
+    "id": "cde2376b",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is going well, but material coverage is still at 0% - focus on covering the remaining chunks.",
+    "created_at": "2026-08-13 22:50:29"
+  },
+  {
+    "id": "8f8db212",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter4",
+    "front": "(reflection note)",
+    "back": "Extract key concepts from the pending chunk first, then try extracting from the current chunk. Also, note that only 2 cards have been created so far, which is a slow pace.",
+    "created_at": "2026-08-13 22:50:59"
+  },
+  {
+    "id": "95f27017",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter5",
+    "front": "(reflection note)",
+    "back": "Drain pending concepts by running 'generate_flashcards' before extracting key concepts. Then, try extracting again.",
+    "created_at": "2026-08-13 22:51:19"
+  },
+  {
+    "id": "08e4fbdf",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "Light-dependent reactions generate ATP and NADPH.",
+    "front": "Where do light-dependent reactions occur?",
+    "back": "In the thylakoid membranes.",
+    "created_at": "2026-08-13 22:51:43"
+  },
+  {
+    "id": "586193bc",
+    "session_id": "sess_044cb6bd",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter6",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is proceeding slowly; consider increasing the number of variants or adjusting the source material to speed up the process.",
+    "created_at": "2026-08-13 22:51:43"
+  },
+  {
+    "id": "bb49b7fd",
+    "session_id": "sess_86ffe652",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has successfully extracted key concepts from the first chunk, but there's still a long way to go in terms of material coverage and deck size. Next, it should proceed to extract key concepts from the remaining chunks.",
+    "created_at": "2026-08-13 22:54:12"
+  },
+  {
+    "id": "0dba5d13",
+    "session_id": "sess_1a18f718",
+    "topic": "Photosynthesis is the process used by plants, algae,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has started extracting key concepts from the material, but it's just beginning and has a long way to go. Next, it should focus on creating flashcards from these concepts.",
+    "created_at": "2026-08-13 22:55:51"
+  },
+  {
+    "id": "55822e92",
+    "session_id": "sess_4c4b1faf",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has started extracting key concepts from the material chunks, but it's still early in the process and only 0% of the material is covered. Next, it should continue extracting key concepts from the remaining chunks.",
+    "created_at": "2026-08-13 22:56:03"
+  },
+  {
+    "id": "218277db",
+    "session_id": "sess_4c4b1faf",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering is the process of collecting, storing, transforming, and managing data.",
+    "front": "What is the primary goal of Data Engineering in support of business analysis and decision-making?",
+    "back": "Collecting, storing, and transforming data to support business analysis and decision-making.",
+    "created_at": "2026-08-13 22:56:44"
+  },
+  {
+    "id": "a23f09f6",
+    "session_id": "sess_4c4b1faf",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "The agent has just started, and it's essential to continue generating flashcards to cover all material chunks. Next, it should focus on generating more cards to increase material coverage.",
+    "created_at": "2026-08-13 22:56:44"
+  },
+  {
+    "id": "4777e69d",
+    "session_id": "sess_4c4b1faf",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data pipeline consists of three major stages.",
+    "front": "What are the three major stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage.",
+    "created_at": "2026-08-13 22:57:14"
+  },
+  {
+    "id": "d8d1e816",
+    "session_id": "sess_4c4b1faf",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is a good start, but the material coverage is still at 0%, so focus on covering all chunks before reviewing the deck.",
+    "created_at": "2026-08-13 22:57:14"
   }
 ]

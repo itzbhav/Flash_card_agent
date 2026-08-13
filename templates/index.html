@@ -97,11 +97,27 @@
                             </div>
                             <div class="card-footer">
                                 <span class="click-hint"><i data-lucide="rotate-3d" class="small-icon"></i> Click to flip back</span>
+                                <button class="btn-trace" onclick="event.stopPropagation(); showActorCriticTrace({{ loop.index0 }})">
+                                    <i data-lucide="git-branch" class="small-icon"></i> Inspect Trace
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+
+            <!-- Actor-Critic Trace Modal -->
+            <div class="modal-overlay" id="trace-modal-overlay" style="display: none;" onclick="closeTraceModal()">
+                <div class="modal-card" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="git-branch" class="title-icon"></i> Actor-Critic Revision Trace & Rubric</h3>
+                        <button class="btn-close-modal" onclick="closeTraceModal()">&times;</button>
+                    </div>
+                    <div class="modal-body" id="trace-modal-body">
+                        <!-- Dynamic trace content injected via JS -->
+                    </div>
+                </div>
             </div>
             {% else %}
             <div class="empty-state">
@@ -274,6 +290,8 @@
                         <button class="pill-btn pill-reason" data-filter="reason">Reason</button>
                         <button class="pill-btn pill-act" data-filter="act">Act</button>
                         <button class="pill-btn pill-reflect" data-filter="reflect">Reflect</button>
+                        <button class="pill-btn pill-actor" data-filter="actor">Actor Logs</button>
+                        <button class="pill-btn pill-judge" data-filter="judge">Judge Logs</button>
                         <button class="pill-btn pill-events" data-filter="events">API & Events</button>
                     </div>
 
@@ -501,6 +519,14 @@
                 if (activeFilter !== 'all') {
                     if (activeFilter === 'events') {
                         if (r.kind !== 'event' && r.kind !== 'session_summary' && r.kind !== 'iteration_start' && r.kind !== 'iteration_end') {
+                            return false;
+                        }
+                    } else if (activeFilter === 'actor') {
+                        if (r.role !== 'actor' && r.kind !== 'actor_output' && r.kind !== 'revision_applied') {
+                            return false;
+                        }
+                    } else if (activeFilter === 'judge') {
+                        if (r.role !== 'judge' && r.kind !== 'judge_output') {
                             return false;
                         }
                     } else {
@@ -842,6 +868,87 @@
             el.innerHTML = `<span class="event-time">${time}</span> <span class="event-text">${html}</span>`;
             list.appendChild(el);
             list.scrollTop = list.scrollHeight;
+        }
+
+        const allFlashcardsData = {{ flashcards | tojson }};
+
+        function showActorCriticTrace(index) {
+            const card = allFlashcardsData[index];
+            if (!card) return;
+
+            const modalBody = document.getElementById('trace-modal-body');
+            let html = `
+                <div class="trace-summary">
+                    <h4>Concept: <span class="text-accent">${escapeHtml(card.concept)}</span></h4>
+                    <div class="trace-badges">
+                        <span class="badge badge-success">Final Score: ${(card.final_score || 0).toFixed(1)}/10</span>
+                        <span class="badge badge-iter">${card.revision_count || 0} Revisions</span>
+                        <span class="badge badge-time">Actor: ${escapeHtml(card.actor_model || 'Groq')}</span>
+                        <span class="badge badge-time">Judge: ${escapeHtml(card.judge_model || 'Groq')}</span>
+                    </div>
+                </div>
+                <div class="trace-timeline">
+            `;
+
+            const versions = card.versions || [];
+            if (versions.length === 0) {
+                html += `
+                    <div class="trace-step pass-step">
+                        <div class="step-header">
+                            <span class="step-title">Initial Draft (Direct Approved)</span>
+                        </div>
+                        <div class="draft-box">
+                            <p><strong>Front:</strong> ${escapeHtml(card.front)}</p>
+                            <p><strong>Back:</strong> ${escapeHtml(card.back)}</p>
+                        </div>
+                        <div class="feedback-box">
+                            <p><strong>Judge Feedback:</strong> ${escapeHtml(card.judge_feedback || 'No revisions required.')}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                versions.forEach((v, idx) => {
+                    const draft = v.draft || {};
+                    const evalRes = v.judge_evaluation || {};
+                    const passed = evalRes.pass;
+                    html += `
+                        <div class="trace-step ${passed ? 'pass-step' : 'revise-step'}">
+                            <div class="step-header">
+                                <span class="step-title">Iteration #${idx + 1} (${passed ? 'PASSED 8.5+ THRESHOLD' : 'REVISE REQUIRED'})</span>
+                                <span class="score-badge">Weighted Score: ${(evalRes.score || 0).toFixed(1)}/10</span>
+                            </div>
+                            <div class="draft-box">
+                                <p class="draft-label"><i data-lucide="bot"></i> Actor Output (Rev ${idx}):</p>
+                                <p class="front-text"><strong>Q:</strong> ${escapeHtml(draft.front)}</p>
+                                <p class="back-text"><strong>A:</strong> ${escapeHtml(draft.back)}</p>
+                            </div>
+                            <div class="rubric-section">
+                                <p class="rubric-label"><i data-lucide="scale"></i> Independent Judge 6-Dimension Rubric Breakdown:</p>
+                                <div class="rubric-grid">
+                                    <div class="rubric-item"><span>Accuracy (25%)</span> <strong>${evalRes.accuracy || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Relevance (15%)</span> <strong>${evalRes.relevance || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Clarity (15%)</span> <strong>${evalRes.clarity || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Completeness (20%)</span> <strong>${evalRes.completeness || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Pedagogical Value (15%)</span> <strong>${evalRes.pedagogical_value || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Conciseness/Atomicity (10%)</span> <strong>${evalRes.conciseness || 0}/10</strong></div>
+                                </div>
+                            </div>
+                            <div class="feedback-box">
+                                <p><strong>Judge Feedback:</strong> ${escapeHtml(evalRes.feedback || 'None')}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            modalBody.innerHTML = html;
+            document.getElementById('trace-modal-overlay').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeTraceModal() {
+            document.getElementById('trace-modal-overlay').style.display = 'none';
         }
 
         function capitalize(s) {
