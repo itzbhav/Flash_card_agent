@@ -8,59 +8,100 @@ from openai import OpenAI
 
 load_dotenv()
 
-# Default model per provider — same underlying LLM, different ID conventions.
-# Override via config.json "model" or the `model` param in call_llm().
-_DEFAULT_MODELS = {
-    "groq":       "llama-3.3-70b-versatile",
-    "openrouter": "openrouter/free",
-    "openai":     "gpt-4o",
-}
+# Free candidate models for each provider
+FREE_MODELS_GROQ = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "openai/gpt-oss-20b",
+]
+
+FREE_MODELS_OPENROUTER = [
+    "google/gemma-4-31b-it:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "nvidia/nemotron-3-nano-30b-a3b:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "openai/gpt-oss-20b:free",
+]
+
+_clients: dict[str, OpenAI] = {}
+
+
+def _get_client_for_provider(provider: str) -> OpenAI | None:
+    """Return or create an OpenAI client for a specific provider ('groq', 'openrouter', 'openai')."""
+    if provider in _clients:
+        return _clients[provider]
+
+    if provider == "openrouter":
+        key = os.environ.get("OPENROUTER_API_KEY")
+        if key:
+            _clients["openrouter"] = OpenAI(
+                api_key=key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+    elif provider == "groq":
+        key = os.environ.get("GROQ_API_KEY")
+        if key:
+            _clients["groq"] = OpenAI(
+                api_key=key,
+                base_url="https://api.groq.com/openai/v1",
+            )
+    elif provider == "openai":
+        key = os.environ.get("OPENAI_API_KEY")
+        if key:
+            _clients["openai"] = OpenAI(api_key=key)
+
+    return _clients.get(provider)
 
 
 def _default_model() -> str:
-    """Return the right model ID for whichever provider is active."""
+    """Return the right default model ID for whichever provider is active."""
     if os.environ.get("USE_OPENROUTER", "false").strip().lower() == "true":
-        return _DEFAULT_MODELS["openrouter"]
+        return FREE_MODELS_OPENROUTER[0]
     if os.environ.get("GROQ_API_KEY"):
-        return _DEFAULT_MODELS["groq"]
-    return _DEFAULT_MODELS["openai"]
-
-_client = None  # created on first use so this module imports without a key
+        return FREE_MODELS_GROQ[0]
+    return "gpt-4o"
 
 
-def _get_client() -> OpenAI:
-    """Create the OpenAI client on first call.
+def _get_fallback_candidates(requested_model: str | None = None) -> list[tuple[str, str]]:
+    """Build an ordered list of (model_id, provider) candidate tuples to try."""
+    use_openrouter = os.environ.get("USE_OPENROUTER", "false").strip().lower() == "true"
+    has_groq = bool(os.environ.get("GROQ_API_KEY"))
+    has_openrouter = bool(os.environ.get("OPENROUTER_API_KEY"))
+    has_openai = bool(os.environ.get("OPENAI_API_KEY"))
 
-    Provider selection (mutually exclusive):
-      • USE_OPENROUTER=true  → OpenRouter  (needs OPENROUTER_API_KEY)
-      • USE_OPENROUTER=false → Groq        (needs GROQ_API_KEY)     [default]
+    candidates = []
 
-    Falls back to plain OpenAI (OPENAI_API_KEY) if neither provider key is set.
-    """
-    global _client
-    if _client is None:
-        use_openrouter = os.environ.get("USE_OPENROUTER", "false").strip().lower() == "true"
+    if requested_model:
+        # Determine provider for requested model
+        prov = "openrouter" if (requested_model.endswith(":free") or ("/" in requested_model and not requested_model.startswith("openai/"))) else "groq"
+        if requested_model in FREE_MODELS_GROQ:
+            prov = "groq"
+        if requested_model in FREE_MODELS_OPENROUTER:
+            prov = "openrouter"
+        candidates.append((requested_model, prov))
 
-        if use_openrouter:
-            openrouter_key = os.environ.get("OPENROUTER_API_KEY")
-            if not openrouter_key:
-                raise RuntimeError(
-                    "USE_OPENROUTER is true but OPENROUTER_API_KEY is not set in .env"
-                )
-            _client = OpenAI(
-                api_key=openrouter_key,
-                base_url="https://openrouter.ai/api/v1",
-            )
-        else:
-            groq_key = os.environ.get("GROQ_API_KEY")
-            if groq_key:
-                _client = OpenAI(
-                    api_key=groq_key,
-                    base_url="https://api.groq.com/openai/v1",
-                )
-            else:
-                _client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-    return _client
+    if not use_openrouter and has_groq:
+        for m in FREE_MODELS_GROQ:
+            if not any(c[0] == m for c in candidates):
+                candidates.append((m, "groq"))
+        if has_openrouter:
+            for m in FREE_MODELS_OPENROUTER:
+                if not any(c[0] == m for c in candidates):
+                    candidates.append((m, "openrouter"))
+    else:
+        if has_openrouter:
+            for m in FREE_MODELS_OPENROUTER:
+                if not any(c[0] == m for c in candidates):
+                    candidates.append((m, "openrouter"))
+        if has_groq:
+            for m in FREE_MODELS_GROQ:
+                if not any(c[0] == m for c in candidates):
+                    candidates.append((m, "groq"))
+
+    if has_openai and not any(c[1] == "openai" for c in candidates):
+        candidates.append(("gpt-4o", "openai"))
+
+    return candidates
 
 
 def _to_openai_tools(tools: list[dict]) -> list[dict]:
@@ -72,7 +113,6 @@ def _to_openai_tools(tools: list[dict]) -> list[dict]:
             "function": {
                 "name": t["name"],
                 "description": t.get("description", ""),
-                # our schemas call it "input_schema"; OpenAI calls it "parameters"
                 "parameters": t.get("input_schema", {"type": "object", "properties": {}}),
             },
         })
@@ -87,18 +127,32 @@ def call_llm(system: str,
              model: str | None = None):
     
     full_messages = [{"role": "system", "content": system}] + messages
+    candidates = _get_fallback_candidates(model)
 
-    kwargs = {
-        "model": model or _default_model(),
-        "messages": full_messages,
-        "max_tokens": max_tokens,
-        "temperature": temperature,
-    }
-    if tools:
-        kwargs["tools"] = _to_openai_tools(tools)
-        kwargs["tool_choice"] = "auto"
+    last_err = None
+    for cand_model, provider in candidates:
+        client = _get_client_for_provider(provider)
+        if not client:
+            continue
 
-    return _get_client().chat.completions.create(**kwargs)
+        kwargs = {
+            "model": cand_model,
+            "messages": full_messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        }
+        if tools:
+            kwargs["tools"] = _to_openai_tools(tools)
+            kwargs["tool_choice"] = "auto"
+
+        try:
+            return client.chat.completions.create(**kwargs)
+        except Exception as e:
+            last_err = e
+            # Continue to next candidate model/provider
+            print(f"  [llm_fallback] Model {cand_model} ({provider}) failed: {type(e).__name__}: {e}. Trying next model...")
+
+    raise last_err
 
 
 def extract_usage(response) -> dict:

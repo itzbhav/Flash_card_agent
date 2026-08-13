@@ -27,6 +27,9 @@
             <a href="#generate" class="nav-link" data-tab="generate">
                 <i data-lucide="sparkles"></i> Generate
             </a>
+            <a href="#logs" class="nav-link" data-tab="logs">
+                <i data-lucide="terminal"></i> Observability Logs
+            </a>
         </div>
     </nav>
 
@@ -229,11 +232,103 @@
                 </div>
             </div>
         </section>
+
+        <!-- ============ TAB 3: OBSERVABILITY LOGS ============ -->
+        <section id="tab-logs" class="tab-content">
+            <header class="header logs-header">
+                <div class="header-content">
+                    <h1><i data-lucide="terminal" class="title-icon"></i> Agent Observability & Log Dashboard</h1>
+                    <p class="panel-subtitle">Inspect per-iteration steps, raw LLM API calls, prompt tokens, retries, and step timing.</p>
+                </div>
+            </header>
+
+            <!-- Logs Toolbar -->
+            <div class="logs-toolbar-card">
+                <div class="toolbar-row top">
+                    <div class="selector-group">
+                        <label for="log-session-select"><i data-lucide="folder-git-2" class="small-icon"></i> Session Log:</label>
+                        <select id="log-session-select" class="log-select">
+                            <option value="">Loading sessions...</option>
+                        </select>
+                    </div>
+
+                    <div class="selector-group">
+                        <label for="log-iter-select"><i data-lucide="repeat" class="small-icon"></i> Iteration:</label>
+                        <select id="log-iter-select" class="log-select">
+                            <option value="all">All Iterations</option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-actions">
+                        <button id="btn-refresh-logs" class="btn-secondary" title="Refresh Logs">
+                            <i data-lucide="refresh-cw"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="toolbar-row bottom">
+                    <!-- Filter Pills -->
+                    <div class="filter-pills" id="step-filter-pills">
+                        <button class="pill-btn active" data-filter="all">All Logs</button>
+                        <button class="pill-btn pill-perceive" data-filter="perceive">Perceive</button>
+                        <button class="pill-btn pill-reason" data-filter="reason">Reason</button>
+                        <button class="pill-btn pill-act" data-filter="act">Act</button>
+                        <button class="pill-btn pill-reflect" data-filter="reflect">Reflect</button>
+                        <button class="pill-btn pill-events" data-filter="events">API & Events</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="search-wrapper">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="log-search-input" placeholder="Search inputs, outputs, errors, tools..." class="log-search-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Stats Header Bar -->
+            <div class="session-stats-bar" id="session-stats-bar" style="display: none;">
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="key" class="small-icon"></i> Session ID</span>
+                    <span class="stat-value" id="lbl-session-id">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="cpu" class="small-icon"></i> Model</span>
+                    <span class="stat-value text-accent" id="lbl-model">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="repeat" class="small-icon"></i> Iterations</span>
+                    <span class="stat-value" id="lbl-iterations">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="zap" class="small-icon"></i> Tokens Used</span>
+                    <span class="stat-value text-amber" id="lbl-tokens">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="alert-circle" class="small-icon"></i> API Retries / Errors</span>
+                    <span class="stat-value" id="lbl-retries-errors">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="flag" class="small-icon"></i> Status / Stop</span>
+                    <span class="stat-value" id="lbl-stop-reason">-</span>
+                </div>
+            </div>
+
+            <!-- Log Entries Container -->
+            <div class="log-feed-container" id="log-feed-container">
+                <div class="log-empty-state" id="log-empty-state">
+                    <i data-lucide="file-text" class="large-icon"></i>
+                    <h3>Select a session log to inspect API & iteration details</h3>
+                </div>
+                <div class="log-list" id="log-list"></div>
+            </div>
+        </section>
     </main>
 
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
+
+        let currentActiveSessionId = null;
 
         // ============ Tab Switching ============
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -244,8 +339,344 @@
                 this.classList.add('active');
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                 document.getElementById('tab-' + tab).classList.add('active');
+
+                if (tab === 'logs') {
+                    loadLogSessions(currentActiveSessionId);
+                }
             });
         });
+
+        // ============ LOG DASHBOARD STATE & FUNCTIONS ============
+        let activeLogRecords = [];
+        let activeSessionSummary = null;
+        let activeFilter = 'all';
+        let activeIterFilter = 'all';
+        let activeSearchQuery = '';
+
+        async function loadLogSessions(autoSelectId = null) {
+            const select = document.getElementById('log-session-select');
+            try {
+                const resp = await fetch('/api/logs');
+                const data = await resp.json();
+                const sessions = data.sessions || [];
+
+                select.innerHTML = '';
+                if (sessions.length === 0) {
+                    select.innerHTML = '<option value="">No log sessions found</option>';
+                    return;
+                }
+
+                sessions.forEach((s, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = s.session_id;
+                    const statusText = s.completed ? `[${s.stop_reason}]` : `[${s.total_iterations} iters]`;
+                    opt.textContent = `${s.formatted_time} — ${s.session_id} ${statusText} (${s.tokens_used.toLocaleString()} tokens)`;
+                    if ((autoSelectId && s.session_id === autoSelectId) || (!autoSelectId && idx === 0)) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+
+                const targetId = select.value;
+                if (targetId) {
+                    loadSessionLogs(targetId);
+                }
+            } catch (err) {
+                console.error('Failed to load log sessions', err);
+            }
+        }
+
+        async function loadSessionLogs(sessionId) {
+            if (!sessionId) return;
+            const logList = document.getElementById('log-list');
+            const emptyState = document.getElementById('log-empty-state');
+            logList.innerHTML = '<div class="log-loading"><i data-lucide="loader" class="spin"></i> Loading session records...</div>';
+            lucide.createIcons();
+
+            try {
+                const resp = await fetch('/api/logs/' + sessionId);
+                const data = await resp.json();
+                if (data.error) {
+                    logList.innerHTML = `<div class="log-error">Error loading logs: ${data.error}</div>`;
+                    return;
+                }
+
+                activeLogRecords = data.records || [];
+                activeSessionSummary = data.summary || null;
+
+                populateIterationFilter(activeLogRecords);
+                updateSessionStatsBar(data);
+                renderLogRecords();
+            } catch (err) {
+                logList.innerHTML = `<div class="log-error">Failed to fetch log details: ${err.message}</div>`;
+            }
+        }
+
+        function populateIterationFilter(records) {
+            const iterSelect = document.getElementById('log-iter-select');
+            const currentVal = iterSelect.value;
+            iterSelect.innerHTML = '<option value="all">All Iterations</option>';
+
+            const iters = new Set();
+            records.forEach(r => {
+                if (r.iteration !== undefined && r.iteration !== null) {
+                    iters.add(r.iteration);
+                }
+            });
+
+            Array.from(iters).sort((a, b) => a - b).forEach(iter => {
+                const opt = document.createElement('option');
+                opt.value = iter;
+                opt.textContent = `Iteration ${iter + 1}`;
+                if (currentVal == iter) opt.selected = true;
+                iterSelect.appendChild(opt);
+            });
+        }
+
+        function updateSessionStatsBar(data) {
+            const bar = document.getElementById('session-stats-bar');
+            bar.style.display = 'grid';
+
+            document.getElementById('lbl-session-id').textContent = data.session_id;
+
+            let model = 'Unknown';
+            let totalIters = 0;
+            let tokens = 0;
+            let retries = 0;
+            let errors = 0;
+            let stopReason = 'in-progress';
+
+            data.records.forEach(r => {
+                if (r.kind === 'session_summary') {
+                    model = r.model || model;
+                    totalIters = r.total_iterations !== undefined ? r.total_iterations : totalIters;
+                    tokens = r.tokens_used || tokens;
+                    stopReason = r.stop_reason || stopReason;
+                } else if (r.kind === 'step') {
+                    if (r.iteration !== undefined) totalIters = Math.max(totalIters, r.iteration + 1);
+                    if (r.error) errors++;
+                } else if (r.kind === 'event') {
+                    if (r.event === 'retry') retries++;
+                    if (r.event === 'token_usage') tokens = r.cumulative || tokens;
+                }
+            });
+
+            document.getElementById('lbl-model').textContent = model;
+            document.getElementById('lbl-iterations').textContent = totalIters;
+            document.getElementById('lbl-tokens').textContent = tokens.toLocaleString();
+            document.getElementById('lbl-retries-errors').textContent = `${retries} retries / ${errors} errs`;
+            
+            const stopEl = document.getElementById('lbl-stop-reason');
+            stopEl.textContent = stopReason;
+            if (stopReason === 'task_complete' || stopReason === 'completed') {
+                stopEl.className = 'stat-value text-green';
+            } else if (stopReason.includes('error') || stopReason.includes('exceeded')) {
+                stopEl.className = 'stat-value text-red';
+            } else {
+                stopEl.className = 'stat-value text-amber';
+            }
+        }
+
+        function renderLogRecords() {
+            const logList = document.getElementById('log-list');
+            const emptyState = document.getElementById('log-empty-state');
+            logList.innerHTML = '';
+
+            if (!activeLogRecords || activeLogRecords.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            const searchLower = activeSearchQuery.toLowerCase();
+
+            const filtered = activeLogRecords.filter(r => {
+                if (activeIterFilter !== 'all') {
+                    if (r.iteration === undefined || r.iteration != activeIterFilter) {
+                        return false;
+                    }
+                }
+
+                if (activeFilter !== 'all') {
+                    if (activeFilter === 'events') {
+                        if (r.kind !== 'event' && r.kind !== 'session_summary' && r.kind !== 'iteration_start' && r.kind !== 'iteration_end') {
+                            return false;
+                        }
+                    } else {
+                        if (r.step !== activeFilter) {
+                            return false;
+                        }
+                    }
+                }
+
+                if (searchLower) {
+                    const str = JSON.stringify(r).toLowerCase();
+                    if (!str.includes(searchLower)) return false;
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                logList.innerHTML = '<div class="log-empty-search"><i data-lucide="search-x"></i> No logs match the selected filters.</div>';
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach((r, index) => {
+                const card = createLogRecordCard(r, index);
+                logList.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function createLogRecordCard(r, index) {
+            const card = document.createElement('div');
+            const kind = r.kind || 'step';
+            const step = r.step || r.event || 'record';
+            
+            let colorClass = 'card-default';
+            if (kind === 'step') {
+                colorClass = `card-step-${step}`;
+            } else if (kind === 'event') {
+                colorClass = step === 'retry' ? 'card-event-retry' : 'card-event-info';
+            } else if (kind === 'session_summary') {
+                colorClass = 'card-summary';
+            } else if (kind.startsWith('iteration')) {
+                colorClass = 'card-iteration-divider';
+            }
+
+            card.className = `log-card ${colorClass} animate-in`;
+
+            const ts = r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : '';
+
+            let statusBadge = '';
+            if (r.error) {
+                statusBadge = `<span class="badge badge-error"><i data-lucide="x-circle"></i> ERROR</span>`;
+            } else if (r.kind === 'step') {
+                statusBadge = `<span class="badge badge-success"><i data-lucide="check"></i> OK</span>`;
+            } else if (r.event === 'retry') {
+                statusBadge = `<span class="badge badge-warning"><i data-lucide="alert-triangle"></i> RETRY</span>`;
+            }
+
+            let iterBadge = r.iteration !== undefined ? `<span class="badge badge-iter">Iter ${r.iteration + 1}</span>` : '';
+            let durationBadge = r.duration_ms !== undefined ? `<span class="badge badge-time"><i data-lucide="clock"></i> ${r.duration_ms} ms</span>` : '';
+            if (r.duration_s !== undefined) durationBadge = `<span class="badge badge-time"><i data-lucide="clock"></i> ${r.duration_s}s</span>`;
+
+            let stepTitle = capitalize(step);
+            if (kind === 'iteration_start') stepTitle = `Iteration ${r.iteration + 1} Start`;
+            if (kind === 'iteration_end') stepTitle = `Iteration ${r.iteration + 1} Complete`;
+            if (kind === 'session_summary') stepTitle = `Session Summary`;
+
+            let previewText = '';
+            if (kind === 'step') {
+                if (step === 'perceive') previewText = 'Material perceived & chunked.';
+                else if (step === 'reason') previewText = r.output ? `Action: ${r.output}` : 'Reasoned next action.';
+                else if (step === 'act') previewText = r.output || (r.input ? `Input: ${r.input}` : 'Performed action.');
+                else if (step === 'reflect') previewText = r.output || 'Reflection captured.';
+            } else if (kind === 'event') {
+                if (r.event === 'retry') previewText = `Retry attempt ${r.attempt}/${r.max_retries} (${r.delay_s}s delay) — Error: ${r.error}`;
+                else if (r.event === 'token_usage') previewText = `Token Usage: +${r.used_this_call} tokens (Total: ${r.cumulative}/${r.budget})`;
+                else previewText = JSON.stringify(r);
+            } else if (kind === 'session_summary') {
+                previewText = `Stopped: ${r.stop_reason} | ${r.total_cards} cards | ${r.tokens_used} tokens | ${r.duration_s}s`;
+            } else if (kind === 'iteration_end') {
+                previewText = `Cards created: ${r.cards_so_far} | Tokens used: ${r.tokens_used}/${r.token_budget}`;
+            }
+
+            const rawJsonId = `json-raw-${index}`;
+
+            card.innerHTML = `
+                <div class="log-card-header">
+                    <div class="log-card-title-group">
+                        <span class="log-kind-badge kind-${kind}">${kind.toUpperCase()}</span>
+                        <h4 class="log-step-title">${stepTitle}</h4>
+                        ${iterBadge}
+                        ${statusBadge}
+                    </div>
+                    <div class="log-card-meta">
+                        ${durationBadge}
+                        <span class="log-timestamp">${ts}</span>
+                    </div>
+                </div>
+                
+                <div class="log-card-body">
+                    <div class="log-preview-text">${escapeHtml(previewText)}</div>
+                    ${r.error ? `<div class="log-error-box"><i data-lucide="alert-octagon"></i> ${escapeHtml(r.error)}</div>` : ''}
+                </div>
+
+                <div class="log-card-footer">
+                    <button class="btn-toggle-json" onclick="toggleJsonView('${rawJsonId}', this)">
+                        <i data-lucide="code"></i> Show Full Record JSON
+                    </button>
+                </div>
+
+                <div class="log-json-drawer" id="${rawJsonId}" style="display: none;">
+                    <pre><code>${escapeHtml(JSON.stringify(r, null, 2))}</code></pre>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function toggleJsonView(id, btn) {
+            const drawer = document.getElementById(id);
+            if (drawer.style.display === 'none') {
+                drawer.style.display = 'block';
+                btn.innerHTML = '<i data-lucide="eye-off"></i> Hide JSON';
+            } else {
+                drawer.style.display = 'none';
+                btn.innerHTML = '<i data-lucide="code"></i> Show Full Record JSON';
+            }
+            lucide.createIcons();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            if (typeof str !== 'string') str = JSON.stringify(str);
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        // Dashboard Event Listeners
+        document.getElementById('log-session-select').addEventListener('change', function() {
+            loadSessionLogs(this.value);
+        });
+
+        document.getElementById('log-iter-select').addEventListener('change', function() {
+            activeIterFilter = this.value;
+            renderLogRecords();
+        });
+
+        document.getElementById('btn-refresh-logs').addEventListener('click', function() {
+            const sel = document.getElementById('log-session-select').value;
+            if (sel) loadSessionLogs(sel);
+            else loadLogSessions();
+        });
+
+        document.getElementById('step-filter-pills').addEventListener('click', function(e) {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            document.querySelectorAll('#step-filter-pills .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            renderLogRecords();
+        });
+
+        document.getElementById('log-search-input').addEventListener('input', function() {
+            activeSearchQuery = this.value.trim();
+            renderLogRecords();
+        });
+
+        // Initial fetch when page loads if on logs tab
+        if (window.location.hash === '#logs') {
+            loadLogSessions();
+        }
 
         // ============ Card Flipping ============
         document.querySelectorAll('.flashcard-container').forEach(container => {
@@ -268,11 +699,9 @@
             const material = materialInput.value.trim();
             if (!material) return;
 
-            // Show the run panel, hide the input
             document.getElementById('input-panel').style.display = 'none';
             document.getElementById('agent-run-panel').style.display = 'block';
 
-            // Start the run
             const formData = new FormData();
             formData.append('material', material);
 
@@ -308,9 +737,10 @@
             const t = event.type;
 
             if (t === 'run_start') {
+                currentActiveSessionId = event.session_id || null;
                 document.getElementById('run-subtitle').textContent =
                     `Model: ${event.model} · Max Iterations: ${event.max_iterations} · Token Budget: ${event.token_budget.toLocaleString()}`;
-                addEvent('system', `🚀 Agent started — model=${event.model}, budget=${event.token_budget.toLocaleString()} tokens`);
+                addEvent('system', `🚀 Agent started — session=${event.session_id || 'new'}, model=${event.model}, budget=${event.token_budget.toLocaleString()} tokens`);
             }
 
             else if (t === 'perceive') {
@@ -336,7 +766,6 @@
                 document.getElementById('stat-cards').textContent = event.total_cards;
                 addEvent('act', `⚡ ${event.observation}`);
 
-                // Add new cards to the live preview
                 if (event.new_cards && event.new_cards.length > 0) {
                     document.getElementById('live-cards-section').style.display = 'block';
                     const grid = document.getElementById('live-cards-grid');
@@ -363,7 +792,6 @@
                 document.getElementById('stat-tokens').textContent = event.tokens_used.toLocaleString();
                 document.getElementById('stat-cards').textContent = event.total_cards;
 
-                // Update progress bar
                 document.getElementById('progress-bar').style.width = covPct + '%';
                 document.getElementById('progress-label').textContent = covPct + '% Coverage';
 

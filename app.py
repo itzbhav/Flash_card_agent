@@ -132,9 +132,11 @@ def _make_patched_reflect(run_id):
 
 def _run_agent_thread(run_id: str, material: str):
     """Run the agent in a background thread, emitting SSE events."""
+    session_id = "sess_" + run_id.replace("run_", "")
     try:
         config = load_config()
         _emit(run_id, "run_start", {
+            "session_id": session_id,
             "model": config.model,
             "max_iterations": config.guardrails.max_iterations,
             "token_budget": config.guardrails.token_budget,
@@ -146,11 +148,12 @@ def _run_agent_thread(run_id: str, material: str):
         _cog.act      = _make_patched_act(run_id)
         _cog.reflect  = _make_patched_reflect(run_id)
 
-        state = run_agent(material, verbose=True, config=config)
+        state = run_agent(material, session_id=session_id, verbose=True, config=config)
 
         path = save_deck(state, "flashcards.json")
 
         _emit(run_id, "run_complete", {
+            "session_id": session_id,
             "stop_reason": state.stop_reason,
             "total_cards": len(state.flashcards),
             "iterations": state.iteration,
@@ -245,6 +248,120 @@ def api_flashcards():
     """JSON API to get the current flashcards."""
     data = _load_flashcards()
     return jsonify(data or {"flashcards": []})
+
+
+@app.route("/api/logs")
+def api_logs_list():
+    """Return a list of available session log files with summary metadata."""
+    log_dir = os.path.join(os.path.dirname(__file__), "logs")
+    if not os.path.exists(log_dir):
+        return jsonify({"sessions": []})
+
+    sessions = []
+    for fname in os.listdir(log_dir):
+        if not fname.endswith(".jsonl"):
+            continue
+        filepath = os.path.join(log_dir, fname)
+        session_id = fname[:-6]
+        mtime = os.path.getmtime(filepath)
+        size_kb = round(os.path.getsize(filepath) / 1024, 1)
+
+        summary_info = {
+            "session_id": session_id,
+            "filename": fname,
+            "mtime": mtime,
+            "formatted_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mtime)),
+            "size_kb": size_kb,
+            "total_steps": 0,
+            "total_iterations": 0,
+            "tokens_used": 0,
+            "stop_reason": "unknown",
+            "model": "unknown",
+            "completed": False,
+            "errors_count": 0,
+            "retries_count": 0,
+        }
+
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                summary_info["total_records"] = len(lines)
+                max_iter = 0
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                        kind = rec.get("kind")
+                        if kind == "step":
+                            summary_info["total_steps"] += 1
+                            if rec.get("error"):
+                                summary_info["errors_count"] += 1
+                            if "iteration" in rec:
+                                max_iter = max(max_iter, rec["iteration"] + 1)
+                        elif kind == "event":
+                            evt = rec.get("event")
+                            if evt == "retry":
+                                summary_info["retries_count"] += 1
+                            elif evt == "token_usage":
+                                summary_info["tokens_used"] = rec.get("cumulative", summary_info["tokens_used"])
+                        elif kind == "session_summary":
+                            summary_info["completed"] = True
+                            summary_info["total_iterations"] = rec.get("total_iterations", max_iter)
+                            summary_info["tokens_used"] = rec.get("tokens_used", summary_info["tokens_used"])
+                            summary_info["stop_reason"] = rec.get("stop_reason", "completed")
+                            summary_info["model"] = rec.get("model", "unknown")
+                            summary_info["duration_s"] = rec.get("duration_s", 0)
+                    except Exception:
+                        pass
+                if not summary_info["completed"]:
+                    summary_info["total_iterations"] = max_iter
+        except Exception as e:
+            summary_info["error"] = str(e)
+
+        sessions.append(summary_info)
+
+    sessions.sort(key=lambda s: s["mtime"], reverse=True)
+    return jsonify({"sessions": sessions})
+
+
+@app.route("/api/logs/<session_id>")
+def api_log_detail(session_id):
+    """Return all json log records for a given session."""
+    session_id = os.path.basename(session_id)
+    if not session_id.endswith(".jsonl"):
+        filename = f"{session_id}.jsonl"
+    else:
+        filename = session_id
+
+    filepath = os.path.join(os.path.dirname(__file__), "logs", filename)
+    if not os.path.exists(filepath):
+        return jsonify({"error": "Log session not found"}), 404
+
+    records = []
+    summary = None
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                    records.append(rec)
+                    if rec.get("kind") == "session_summary":
+                        summary = rec
+                except json.JSONDecodeError:
+                    pass
+        return jsonify({
+            "session_id": session_id.replace(".jsonl", ""),
+            "records": records,
+            "summary": summary,
+            "total_records": len(records)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def _load_flashcards():
