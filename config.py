@@ -13,6 +13,7 @@ from __future__ import annotations
 import os
 import json
 from dataclasses import dataclass, field, asdict
+from llm import _default_model
 
 
 @dataclass
@@ -42,7 +43,7 @@ class GuardrailConfig:
 
 @dataclass
 class HarnessConfig:
-    model: str = "gpt-4o"
+    model: str = field(default_factory=_default_model)
     retry: RetryConfig = field(default_factory=RetryConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     guardrails: GuardrailConfig = field(default_factory=GuardrailConfig)

@@ -682,5 +682,644 @@
     "front": "(reflection note)",
     "back": "(reflection parse issue: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01khx742yafymaz7a91cxtg6tg` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99857, Requested 633. Please try again in 7m3.36s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}})",
     "created_at": "2026-08-13 16:50:48"
+  },
+  {
+    "id": "63a2f2db",
+    "session_id": "sess_95e05306",
+    "topic": "The water cycle describes how water moves continuously",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01khx742yafymaz7a91cxtg6tg` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99579, Requested 538. Please try again in 1m41.088s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}})",
+    "created_at": "2026-08-13 17:16:49"
+  },
+  {
+    "id": "2caabe3d",
+    "session_id": "sess_21563bc1",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has successfully extracted key concepts from the first chunk, and should now create flashcards based on these concepts to start building the deck.",
+    "created_at": "2026-08-13 19:53:15"
+  },
+  {
+    "id": "cc1e8bcb",
+    "session_id": "sess_21563bc1",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering",
+    "front": "What is the primary goal of Data Engineering?",
+    "back": "To collect, store, transform, and manage data for effective analysis and decision-making",
+    "created_at": "2026-08-13 19:53:17"
+  },
+  {
+    "id": "76a60255",
+    "session_id": "sess_21563bc1",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Progress is slow, generate more flashcards to cover the remaining material chunks",
+    "created_at": "2026-08-13 19:53:17"
+  },
+  {
+    "id": "68d0572b",
+    "session_id": "sess_21563bc1",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Ingestion",
+    "front": "What is the primary function of data ingestion?",
+    "back": "Collecting data from various sources such as databases, APIs, files, and streaming systems.",
+    "created_at": "2026-08-13 19:53:20"
+  },
+  {
+    "id": "bdcf8f7d",
+    "session_id": "sess_21563bc1",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Progress is slow, consider increasing the number of variants or covering more concepts to reach 100% material coverage, focus on generating cards for the remaining chunks.",
+    "created_at": "2026-08-13 19:53:20"
+  },
+  {
+    "id": "a7675cc6",
+    "session_id": "sess_4ac9ca57",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:02:53"
+  },
+  {
+    "id": "c1cad21a",
+    "session_id": "sess_4ac9ca57",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:02:53"
+  },
+  {
+    "id": "a9eb33f3",
+    "session_id": "sess_4ac9ca57",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:02:54"
+  },
+  {
+    "id": "3a4c8e1f",
+    "session_id": "sess_ecff1658",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:03:06"
+  },
+  {
+    "id": "5507c438",
+    "session_id": "sess_ecff1658",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:03:06"
+  },
+  {
+    "id": "c8f3e305",
+    "session_id": "sess_ecff1658",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:03:07"
+  },
+  {
+    "id": "9355ffbe",
+    "session_id": "sess_2ad68b39",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:07:48"
+  },
+  {
+    "id": "b8ffa71b",
+    "session_id": "sess_2ad68b39",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:07:49"
+  },
+  {
+    "id": "589d06a7",
+    "session_id": "sess_2ad68b39",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:07:49"
+  },
+  {
+    "id": "04a0406a",
+    "session_id": "sess_6bbff5a9",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:08:00"
+  },
+  {
+    "id": "4bf06d25",
+    "session_id": "sess_6bbff5a9",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:08:00"
+  },
+  {
+    "id": "303b0294",
+    "session_id": "sess_6bbff5a9",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:08:00"
+  },
+  {
+    "id": "424272a6",
+    "session_id": "sess_762c29cb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:11:04"
+  },
+  {
+    "id": "79f0f4c9",
+    "session_id": "sess_762c29cb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:11:04"
+  },
+  {
+    "id": "e27aa170",
+    "session_id": "sess_762c29cb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:11:05"
+  },
+  {
+    "id": "06b91f59",
+    "session_id": "sess_f8e85b33",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:13:12"
+  },
+  {
+    "id": "daefc90c",
+    "session_id": "sess_f8e85b33",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:13:13"
+  },
+  {
+    "id": "16f2e5dd",
+    "session_id": "sess_f8e85b33",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 400 - {'error': {'message': 'llama-3.3-70b-versatile is not a valid model ID', 'code': 400}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:13:13"
+  },
+  {
+    "id": "062f7518",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "Concept extraction for chunk 0 is a good start, but no flashcards exist yet. Next, create cards from these concepts, then cover chunk 1 and review the deck.",
+    "created_at": "2026-08-13 20:17:10"
+  },
+  {
+    "id": "2d57ba61",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "A data pipeline typically has three major stages: data ingestion, data processing, and data storage.",
+    "front": "What are the three major stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage.",
+    "created_at": "2026-08-13 20:17:26"
+  },
+  {
+    "id": "69639d5f",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Progress has just begun with one card created and no material chunks marked covered. Continue generating flashcards for the remaining source chunks, then review the deck and resolve any weak cards.",
+    "created_at": "2026-08-13 20:17:26"
+  },
+  {
+    "id": "80f61856",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "The last action failed because 'generate_flashcard' is not a valid action; use the correct card-creation action and continue covering the material chunks.",
+    "created_at": "2026-08-13 20:17:35"
+  },
+  {
+    "id": "9b4b0bdd",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data processing involves cleaning, transforming, and validating raw data to improve quality.",
+    "front": "What three activities are performed during data processing to improve the quality of raw data?",
+    "back": "Cleaning, transforming, and validating raw data.",
+    "created_at": "2026-08-13 20:17:49"
+  },
+  {
+    "id": "51ff1daa",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "Progress is being made, but material coverage is still 0/2 and the deck has not been reviewed. Continue generating cards for the remaining source chunks, then review and resolve any weak cards.",
+    "created_at": "2026-08-13 20:17:49"
+  },
+  {
+    "id": "e63d9908",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data ingestion is the stage where data is collected from sources.",
+    "front": "In a data pipeline, which stage is responsible for collecting data from sources such as databases, APIs, files, and streaming systems?",
+    "back": "Data ingestion",
+    "created_at": "2026-08-13 20:18:23"
+  },
+  {
+    "id": "2f902041",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter4",
+    "front": "(reflection note)",
+    "back": "Progress is underway, but material coverage is still incomplete and the deck has not been reviewed. Continue generating cards for the remaining chunks, then review and resolve any weak cards.",
+    "created_at": "2026-08-13 20:18:23"
+  },
+  {
+    "id": "9a94b029",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data engineering encompasses four core activities—collecting, storing, transforming, and managing data—so the data can be used effectively for analysis and decision-making.",
+    "front": "What four core activities does data engineering include so data can be used effectively for analysis and decision-making?",
+    "back": "Collecting, storing, transforming, and managing data.",
+    "created_at": "2026-08-13 20:18:41"
+  },
+  {
+    "id": "c21b75e1",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter5",
+    "front": "(reflection note)",
+    "back": "Coverage is still 0/2 chunks, so the agent should continue generating cards from the remaining material rather than stopping. After coverage is complete, review the deck and resolve any weak cards.",
+    "created_at": "2026-08-13 20:18:41"
+  },
+  {
+    "id": "ebec88ad",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data engineering is the process of collecting, storing, transforming, and managing data for analysis and decision-making.",
+    "front": "What is data engineering?",
+    "back": "The process of collecting, storing, transforming, and managing data so it can be used effectively for analysis and decision-making.",
+    "created_at": "2026-08-13 20:18:56"
+  },
+  {
+    "id": "8865d5f4",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter6",
+    "front": "(reflection note)",
+    "back": "A card was generated, but material coverage still shows 0/2 chunks, so the covered chunk should be marked or the remaining source material needs cards. Continue covering all chunks, then review the deck and resolve weak cards.",
+    "created_at": "2026-08-13 20:18:56"
+  },
+  {
+    "id": "86e4cbd0",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Common data ingestion sources include databases, APIs, files, and streaming systems.",
+    "front": "Name four common sources of data ingestion.",
+    "back": "Databases, APIs, files, and streaming systems.",
+    "created_at": "2026-08-13 20:19:29"
+  },
+  {
+    "id": "4dac24c9",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter7",
+    "front": "(reflection note)",
+    "back": "Progress is good, but only half the material is covered, so continue generating cards for the remaining chunk(s). After full coverage, review the deck and resolve any weak cards.",
+    "created_at": "2026-08-13 20:19:29"
+  },
+  {
+    "id": "74183fb5",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter8",
+    "front": "(reflection note)",
+    "back": "Concept extraction for chunk 1 is progressing, but those concepts still need to be turned into cards and the deck must be reviewed. Continue creating cards from the extracted concepts, then review and resolve any weak cards.",
+    "created_at": "2026-08-13 20:19:38"
+  },
+  {
+    "id": "7f0ac213",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Processed data is stored in systems such as data warehouses, data lakes, or databases.",
+    "front": "After data is processed, what types of systems is it typically stored in?",
+    "back": "Processed data is typically stored in systems such as data warehouses, data lakes, or databases.",
+    "created_at": "2026-08-13 20:19:53"
+  },
+  {
+    "id": "004459d6",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter9",
+    "front": "(reflection note)",
+    "back": "Coverage is only halfway complete, so continue generating flashcards for the remaining material chunk before reviewing the deck and resolving any weak cards.",
+    "created_at": "2026-08-13 20:19:53"
+  },
+  {
+    "id": "cf5f82dd",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "ETL stands for Extract, Transform, Load.",
+    "front": "What does ETL stand for?",
+    "back": "Extract, Transform, Load",
+    "created_at": "2026-08-13 20:20:05"
+  },
+  {
+    "id": "3db349da",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter10",
+    "front": "(reflection note)",
+    "back": "Progress is good with 8 cards and the ETL concept covered, but only half the material is complete; next generate cards for the remaining chunk, then review the deck and resolve weak cards.",
+    "created_at": "2026-08-13 20:20:05"
+  },
+  {
+    "id": "4bf604db",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter11",
+    "front": "(reflection note)",
+    "back": "The flashcard generation failed because an unknown action was used, and only half the material is covered. Use the correct card-creation action to finish the remaining chunk, then review the deck and resolve any weak cards.",
+    "created_at": "2026-08-13 20:20:11"
+  },
+  {
+    "id": "d818dca3",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "In ETL, data is transformed before it is loaded into the target system.",
+    "front": "In ETL, when is data transformed relative to loading it into the target system?",
+    "back": "Data is transformed after it is extracted and before it is loaded into the target system.",
+    "created_at": "2026-08-13 20:20:23"
+  },
+  {
+    "id": "6b92417a",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter12",
+    "front": "(reflection note)",
+    "back": "The ETL card was generated successfully, but only half of the material is covered. Next, create cards for the remaining chunk, then review the deck and resolve any weak cards.",
+    "created_at": "2026-08-13 20:20:23"
+  },
+  {
+    "id": "3bb11b8e",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data engineering helps organizations build reliable and scalable systems for analytics, machine learning, and business intelligence.",
+    "front": "What does data engineering help organizations build?",
+    "back": "Reliable and scalable systems for analytics, machine learning, and business intelligence.",
+    "created_at": "2026-08-13 20:20:31"
+  },
+  {
+    "id": "fe5866d0",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter13",
+    "front": "(reflection note)",
+    "back": "Material coverage is complete, but the deck still needs to be reviewed and any weak cards resolved before finishing.",
+    "created_at": "2026-08-13 20:20:31"
+  },
+  {
+    "id": "1e0a9004",
+    "session_id": "sess_c87e8783",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter14",
+    "front": "(reflection note)",
+    "back": "Material coverage is complete, but the deck review failed with a JSON decoding error, so the required review step has not been successfully completed. Retry review_deck and resolve any weak cards if the review returns valid results.",
+    "created_at": "2026-08-13 20:20:58"
+  },
+  {
+    "id": "779d4748",
+    "session_id": "sess_7239c628",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits or too high max_tokens, so no material has been covered. Retry with a much lower max_tokens setting or resolve the credit issue before continuing.",
+    "created_at": "2026-08-13 20:32:52"
+  },
+  {
+    "id": "a76ad69f",
+    "session_id": "sess_7239c628",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient credits or too high max_tokens, so no material has been covered yet. Retry with a much lower max_tokens or a smaller/simpler extraction request before continuing.",
+    "created_at": "2026-08-13 20:32:55"
+  },
+  {
+    "id": "d61514b0",
+    "session_id": "sess_7239c628",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed because the API request exceeded available credits, so no material has been covered and no cards exist. Retry with a much smaller max_tokens setting or otherwise resolve the credit limitation before continuing.",
+    "created_at": "2026-08-13 20:32:57"
+  },
+  {
+    "id": "fd00512c",
+    "session_id": "sess_8252ae09",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits or too high max_tokens, so no progress has been made on the single material chunk. Retry with a lower max_tokens setting or resolve the credit issue before continuing.",
+    "created_at": "2026-08-13 20:33:17"
+  },
+  {
+    "id": "995079a4",
+    "session_id": "sess_8252ae09",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits, so no material has been covered or cards created. Retry with a much lower max_tokens or otherwise proceed without additional API calls if possible.",
+    "created_at": "2026-08-13 20:33:19"
+  },
+  {
+    "id": "194cd6c1",
+    "session_id": "sess_8252ae09",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits, so no material has been covered and no cards exist. Retry with a much lower max_tokens/smaller prompt if possible, otherwise the task cannot proceed.",
+    "created_at": "2026-08-13 20:33:21"
+  },
+  {
+    "id": "f6937e04",
+    "session_id": "sess_5c6e6f0a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits or too high max_tokens, so no progress has been made. Retry with a much lower max_tokens or resolve the credit limitation before continuing.",
+    "created_at": "2026-08-13 20:34:16"
+  },
+  {
+    "id": "59c3e56f",
+    "session_id": "sess_5c6e6f0a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient API credits/too high max_tokens, so no material has been covered yet. Retry with a much lower max_tokens or a minimal extraction approach, then create cards from the chunk.",
+    "created_at": "2026-08-13 20:34:18"
+  },
+  {
+    "id": "3365dbbb",
+    "session_id": "sess_5c6e6f0a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Concept extraction failed due to insufficient credits or too high max_tokens, so no material has been covered yet. Lower the token budget or resolve the credit issue, then retry extracting chunk 0.",
+    "created_at": "2026-08-13 20:34:23"
+  },
+  {
+    "id": "ef1c8f07",
+    "session_id": "sess_411428eb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:00"
+  },
+  {
+    "id": "4e2fdcac",
+    "session_id": "sess_411428eb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:00"
+  },
+  {
+    "id": "7c566a54",
+    "session_id": "sess_411428eb",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:00"
+  },
+  {
+    "id": "32ca6423",
+    "session_id": "sess_ae0dfe51",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:28"
+  },
+  {
+    "id": "ce2971a4",
+    "session_id": "sess_ae0dfe51",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:29"
+  },
+  {
+    "id": "98a711b1",
+    "session_id": "sess_ae0dfe51",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Error code: 402 - {'error': {'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account', 'code': 402, 'metadata': {'limit_source': 'openrouter_credits', 'remedy_hint': 'Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.', 'provider_name': None, 'previous_errors': [{'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}, {'code': 402, 'message': 'This request requires more credits, or fewer max_tokens. You requested up to 300 tokens, but can only afford 1. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account'}]}}, 'user_id': 'user_3Bk68QbuRdv5A8CygNozxZhAMjI'})",
+    "created_at": "2026-08-13 20:36:29"
+  },
+  {
+    "id": "86bca384",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Expecting property name enclosed in double quotes: line 1 column 2 (char 1))",
+    "created_at": "2026-08-13 20:38:54"
+  },
+  {
+    "id": "dd7a84e0",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering is the process of collecting, storing, transforming, and managing data so it can be used effectively for analysis and decision‑making",
+    "front": "What is Data Engineering?",
+    "back": "Data Engineering is the process of collecting, storing, transforming, and managing data to enable effective analysis and decision-making. It involves three key stages in a data pipeline: data ingestion (collecting data), data processing (transforming/cleaning data), and data storage (organizing data for use).",
+    "created_at": "2026-08-13 20:40:02"
+  },
+  {
+    "id": "87208fac",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Only one chunk has been processed (0% coverage); continue generating flashcards for the remaining 14 chunks before moving on to review.",
+    "created_at": "2026-08-13 20:40:02"
+  },
+  {
+    "id": "f77f311d",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering is the process of collecting, storing, transforming, and managing data so it can be used effectively for analysis and decision‑making.",
+    "front": "What is Data Engineering?",
+    "back": "The process of collecting, storing, transforming, and managing data to enable effective analysis and decision-making.",
+    "created_at": "2026-08-13 20:41:28"
+  },
+  {
+    "id": "84f55607",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "User Safety: safe",
+    "created_at": "2026-08-13 20:41:28"
+  },
+  {
+    "id": "7daedc11",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data ingestion is the first stage of a data pipeline, where raw data is collected from source systems.",
+    "front": "What does data ingestion refer to in a data pipeline?",
+    "back": "The first stage where raw data is collected from source systems.",
+    "created_at": "2026-08-13 20:44:29"
+  },
+  {
+    "id": "5b51f65c",
+    "session_id": "sess_e8bfbea4",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "(reflection parse issue: Expecting value: line 1 column 1 (char 0))",
+    "created_at": "2026-08-13 20:44:29"
   }
 ]

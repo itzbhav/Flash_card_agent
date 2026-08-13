@@ -10,7 +10,7 @@ Each tool is annotated with the reasoning pattern it exists to serve:
 from __future__ import annotations
 
 import json
-from llm import call_llm, extract_text, MODEL
+from llm import call_llm, extract_text, _default_model
 
 
 # ----------------------------------------------------------------------------
@@ -165,8 +165,8 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
             "revision_count": revision_count,
             "final_score": final_score,
             "judge_feedback": judge_feedback,
-            "actor_model": MODEL,
-            "judge_model": MODEL
+            "actor_model": _default_model(),
+            "judge_model": _default_model()
         })
         
     return {"variants": variants, "count": len(variants)}

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashCard Agent — AI-Powered Study Cards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i data-lucide="zap" class="brand-icon"></i>
+            <span class="brand-name">FlashCard Agent</span>
+        </div>
+        <div class="nav-links">
+            <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="#generate" class="nav-link" data-tab="generate">
+                <i data-lucide="sparkles"></i> Generate
+            </a>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- ============ TAB 1: DASHBOARD ============ -->
+        <section id="tab-dashboard" class="tab-content active">
+            <header class="header">
+                <div class="header-content">
+                    <h1 id="deck-topic">{{ topic }}</h1>
+                    {% if stats %}
+                    <div class="stats">
+                        <span class="stat-badge">
+                            <i data-lucide="layers"></i> {{ stats.count }} Cards
+                        </span>
+                        <span class="stat-badge">
+                            <i data-lucide="refresh-cw"></i> {{ stats.iterations }} Iterations
+                        </span>
+                        {% if stats.completed %}
+                        <span class="stat-badge success">
+                            <i data-lucide="check-circle"></i> Completed
+                        </span>
+                        {% else %}
+                        <span class="stat-badge warning">
+                            <i data-lucide="alert-triangle"></i> {{ stats.stop_reason | default('unknown') }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if flashcards %}
+            <div class="flashcard-grid" id="flashcard-grid">
+                {% for card in flashcards %}
+                <div class="flashcard-container" style="animation-delay: {{ loop.index0 * 0.08 }}s">
+                    <div class="flashcard">
+                        <div class="card-face card-front">
+                            <div class="card-header">
+                                <span class="difficulty {{ card.difficulty }}">{{ card.difficulty | capitalize }}</span>
+                                <span class="concept"><i data-lucide="tag" class="small-icon"></i> {{ card.concept }}</span>
+                            </div>
+                            <div class="card-body">
+                                <h2>{{ card.front }}</h2>
+                            </div>
+                            <div class="card-footer">
+                                <span class="click-hint"><i data-lucide="rotate-3d" class="small-icon"></i> Click to flip</span>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-header">
+                                <span class="score-badge">Score: {{ "%.1f"|format(card.final_score) }}/10</span>
+                                {% if card.revision_count > 0 %}
+                                <span class="revision-badge"><i data-lucide="edit-3" class="small-icon"></i> {{ card.revision_count }} revisions</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <p class="answer">{{ card.back }}</p>
+                                {% if card.judge_feedback %}
+                                <div class="feedback-section">
+                                    <p class="feedback-label"><i data-lucide="message-square" class="small-icon"></i> Judge Feedback</p>
+                                    <p class="feedback-text">{{ card.judge_feedback }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <span class="click-hint"><i data-lucide="rotate-3d" class="small-icon"></i> Click to flip back</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i data-lucide="book-open" class="large-icon"></i>
+                <h2>No flashcards yet</h2>
+                <p>Go to the <strong>Generate</strong> tab and paste your study material to get started!</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- ============ TAB 2: GENERATE ============ -->
+        <section id="tab-generate" class="tab-content">
+
+            <!-- Input Area -->
+            <div class="generate-panel" id="input-panel">
+                <div class="panel-header">
+                    <i data-lucide="file-text" class="panel-icon"></i>
+                    <div>
+                        <h2>Generate Flashcards</h2>
+                        <p class="panel-subtitle">Paste your study material below and let the AI agent create high-quality flashcards.</p>
+                    </div>
+                </div>
+                <form id="generate-form">
+                    <div class="textarea-wrapper">
+                        <textarea id="material-input" name="material" rows="10"
+                            placeholder="Paste your notes, textbook excerpt, or study material here..."></textarea>
+                        <span class="char-count" id="char-count">0 characters</span>
+                    </div>
+                    <button type="submit" class="btn-generate" id="btn-generate">
+                        <i data-lucide="sparkles"></i>
+                        <span>Start Agent Run</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Agent Run Visualization -->
+            <div class="agent-run-panel" id="agent-run-panel" style="display: none;">
+
+                <!-- Run Header -->
+                <div class="run-header">
+                    <div class="run-header-left">
+                        <div class="run-status-indicator running" id="run-status-indicator">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-dot"></div>
+                        </div>
+                        <div>
+                            <h2 id="run-title">Agent Running…</h2>
+                            <p class="run-subtitle" id="run-subtitle">Initializing…</p>
+                        </div>
+                    </div>
+                    <div class="run-stats-mini">
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-iteration">0</span>
+                            <span class="mini-stat-label">Iteration</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-cards">0</span>
+                            <span class="mini-stat-label">Cards</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-coverage">0%</span>
+                            <span class="mini-stat-label">Coverage</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-tokens">0</span>
+                            <span class="mini-stat-label">Tokens</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Loop Visualization -->
+                <div class="loop-visualizer">
+                    <div class="loop-step" id="loop-perceive">
+                        <div class="loop-step-icon"><i data-lucide="eye"></i></div>
+                        <span class="loop-step-label">Perceive</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-reason">
+                        <div class="loop-step-icon"><i data-lucide="brain"></i></div>
+                        <span class="loop-step-label">Reason</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-act">
+                        <div class="loop-step-icon"><i data-lucide="hammer"></i></div>
+                        <span class="loop-step-label">Act</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-reflect">
+                        <div class="loop-step-icon"><i data-lucide="message-circle"></i></div>
+                        <span class="loop-step-label">Reflect</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                    <span class="progress-label" id="progress-label">0% Coverage</span>
+                </div>
+
+                <!-- Live Event Feed -->
+                <div class="event-feed" id="event-feed">
+                    <div class="event-feed-header">
+                        <i data-lucide="activity"></i>
+                        <span>Live Agent Log</span>
+                    </div>
+                    <div class="event-list" id="event-list">
+                        <!-- Events will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Live Cards Preview -->
+                <div class="live-cards-section" id="live-cards-section" style="display:none;">
+                    <h3><i data-lucide="layers" class="small-icon"></i> Cards Generated So Far</h3>
+                    <div class="live-cards-grid" id="live-cards-grid">
+                    </div>
+                </div>
+
+                <!-- Completion Banner -->
+                <div class="completion-banner" id="completion-banner" style="display:none;">
+                    <div class="completion-icon">
+                        <i data-lucide="check-circle-2"></i>
+                    </div>
+                    <h2 id="completion-title">Run Complete!</h2>
+                    <p id="completion-detail"></p>
+                    <button class="btn-generate" onclick="window.location.href='/'">
+                        <i data-lucide="layout-dashboard"></i> View Flashcards
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // ============ Tab Switching ============
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab-' + tab).classList.add('active');
+            });
+        });
+
+        // ============ Card Flipping ============
+        document.querySelectorAll('.flashcard-container').forEach(container => {
+            container.addEventListener('click', function() {
+                this.querySelector('.flashcard').classList.toggle('is-flipped');
+            });
+        });
+
+        // ============ Character Counter ============
+        const materialInput = document.getElementById('material-input');
+        const charCount = document.getElementById('char-count');
+        materialInput.addEventListener('input', () => {
+            charCount.textContent = materialInput.value.length + ' characters';
+        });
+
+        // ============ Agent Run Logic ============
+        const form = document.getElementById('generate-form');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const material = materialInput.value.trim();
+            if (!material) return;
+
+            // Show the run panel, hide the input
+            document.getElementById('input-panel').style.display = 'none';
+            document.getElementById('agent-run-panel').style.display = 'block';
+
+            // Start the run
+            const formData = new FormData();
+            formData.append('material', material);
+
+            try {
+                const resp = await fetch('/run', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                connectSSE(data.run_id);
+            } catch (err) {
+                addEvent('error', 'Failed to start the agent run: ' + err.message);
+            }
+        });
+
+        function connectSSE(runId) {
+            const evtSource = new EventSource('/stream/' + runId);
+            evtSource.onmessage = function(e) {
+                const event = JSON.parse(e.data);
+                handleEvent(event);
+                if (event.type === 'stream_end') {
+                    evtSource.close();
+                }
+            };
+            evtSource.onerror = function() {
+                addEvent('error', 'SSE connection lost.');
+                evtSource.close();
+            };
+        }
+
+        function handleEvent(event) {
+            const t = event.type;
+
+            if (t === 'run_start') {
+                document.getElementById('run-subtitle').textContent =
+                    `Model: ${event.model} · Max Iterations: ${event.max_iterations} · Token Budget: ${event.token_budget.toLocaleString()}`;
+                addEvent('system', `🚀 Agent started — model=${event.model}, budget=${event.token_budget.toLocaleString()} tokens`);
+            }
+
+            else if (t === 'perceive') {
+                highlightStep('perceive');
+                document.getElementById('run-subtitle').textContent =
+                    `Topic: "${event.topic}" — ${event.total_chunks} chunks, ${event.total_words} words`;
+                addEvent('perceive', `📖 Perceived material: "${event.topic}" — ${event.total_chunks} chunks, ${event.total_words} words`);
+            }
+
+            else if (t === 'step_start') {
+                highlightStep(event.step);
+            }
+
+            else if (t === 'reason') {
+                highlightStep('reason');
+                document.getElementById('stat-iteration').textContent = event.iteration + 1;
+                const argsStr = event.action_input ? JSON.stringify(event.action_input) : '{}';
+                addEvent('reason', `🧠 Iteration ${event.iteration + 1}: chose <span class="event-action">${event.action_name}</span> ${argsStr}`);
+            }
+
+            else if (t === 'act') {
+                highlightStep('act');
+                document.getElementById('stat-cards').textContent = event.total_cards;
+                addEvent('act', `⚡ ${event.observation}`);
+
+                // Add new cards to the live preview
+                if (event.new_cards && event.new_cards.length > 0) {
+                    document.getElementById('live-cards-section').style.display = 'block';
+                    const grid = document.getElementById('live-cards-grid');
+                    event.new_cards.forEach(card => {
+                        const el = document.createElement('div');
+                        el.className = 'live-card animate-in';
+                        el.innerHTML = `
+                            <div class="live-card-header">
+                                <span class="difficulty ${card.difficulty}">${capitalize(card.difficulty)}</span>
+                                <span class="score-badge">Score: ${card.final_score.toFixed(1)}/10</span>
+                            </div>
+                            <p class="live-card-q">${card.front}</p>
+                            <p class="live-card-a">${card.back}</p>
+                        `;
+                        grid.appendChild(el);
+                    });
+                }
+            }
+
+            else if (t === 'reflect') {
+                highlightStep('reflect');
+                const covPct = (event.coverage * 100).toFixed(0);
+                document.getElementById('stat-coverage').textContent = covPct + '%';
+                document.getElementById('stat-tokens').textContent = event.tokens_used.toLocaleString();
+                document.getElementById('stat-cards').textContent = event.total_cards;
+
+                // Update progress bar
+                document.getElementById('progress-bar').style.width = covPct + '%';
+                document.getElementById('progress-label').textContent = covPct + '% Coverage';
+
+                addEvent('reflect', `💭 ${event.note}`);
+                if (event.done) {
+                    addEvent('system', '✅ Agent marked the task as done.');
+                }
+            }
+
+            else if (t === 'run_complete') {
+                clearStepHighlights();
+                document.getElementById('run-status-indicator').className = 'run-status-indicator done';
+                document.getElementById('run-title').textContent = 'Run Complete!';
+
+                document.getElementById('completion-banner').style.display = 'flex';
+                document.getElementById('completion-title').textContent =
+                    event.stop_reason === 'task_complete' ? '✅ Agent Completed Successfully!' : `⚠️ Stopped: ${event.stop_reason}`;
+                document.getElementById('completion-detail').textContent =
+                    `${event.total_cards} cards generated in ${event.iterations} iterations using ${event.tokens_used.toLocaleString()} tokens.`;
+
+                addEvent('system', `🏁 Run finished: ${event.stop_reason} — ${event.total_cards} cards, ${event.iterations} iters, ${event.tokens_used.toLocaleString()} tokens`);
+                lucide.createIcons();
+            }
+
+            else if (t === 'run_error') {
+                document.getElementById('run-status-indicator').className = 'run-status-indicator error';
+                document.getElementById('run-title').textContent = 'Run Failed';
+                addEvent('error', `❌ Error: ${event.error}`);
+            }
+        }
+
+        function highlightStep(stepName) {
+            document.querySelectorAll('.loop-step').forEach(el => el.classList.remove('active'));
+            const el = document.getElementById('loop-' + stepName);
+            if (el) el.classList.add('active');
+        }
+
+        function clearStepHighlights() {
+            document.querySelectorAll('.loop-step').forEach(el => el.classList.remove('active'));
+        }
+
+        function addEvent(type, html) {
+            const list = document.getElementById('event-list');
+            const el = document.createElement('div');
+            el.className = 'event-item event-' + type + ' animate-in';
+
+            const time = new Date().toLocaleTimeString();
+            el.innerHTML = `<span class="event-time">${time}</span> <span class="event-text">${html}</span>`;
+            list.appendChild(el);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+    </script>
+</body>
+</html>

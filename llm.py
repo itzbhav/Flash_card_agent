@@ -8,22 +8,58 @@ from openai import OpenAI
 
 load_dotenv()
 
-# Set this to whatever model your key can access (e.g. "gpt-4o", "gpt-4o-mini",
-# "gpt-4.1"). Kept in one place so it's trivial to change.
-MODEL = "llama-3.3-70b-versatile"
+# Default model per provider — same underlying LLM, different ID conventions.
+# Override via config.json "model" or the `model` param in call_llm().
+_DEFAULT_MODELS = {
+    "groq":       "llama-3.3-70b-versatile",
+    "openrouter": "openrouter/free",
+    "openai":     "gpt-4o",
+}
+
+
+def _default_model() -> str:
+    """Return the right model ID for whichever provider is active."""
+    if os.environ.get("USE_OPENROUTER", "false").strip().lower() == "true":
+        return _DEFAULT_MODELS["openrouter"]
+    if os.environ.get("GROQ_API_KEY"):
+        return _DEFAULT_MODELS["groq"]
+    return _DEFAULT_MODELS["openai"]
 
 _client = None  # created on first use so this module imports without a key
 
 
 def _get_client() -> OpenAI:
-    """Create the OpenAI client on first call. Supports Groq via OpenAI client."""
+    """Create the OpenAI client on first call.
+
+    Provider selection (mutually exclusive):
+      • USE_OPENROUTER=true  → OpenRouter  (needs OPENROUTER_API_KEY)
+      • USE_OPENROUTER=false → Groq        (needs GROQ_API_KEY)     [default]
+
+    Falls back to plain OpenAI (OPENAI_API_KEY) if neither provider key is set.
+    """
     global _client
     if _client is None:
-        groq_key = os.environ.get("GROQ_API_KEY")
-        if groq_key:
-            _client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
+        use_openrouter = os.environ.get("USE_OPENROUTER", "false").strip().lower() == "true"
+
+        if use_openrouter:
+            openrouter_key = os.environ.get("OPENROUTER_API_KEY")
+            if not openrouter_key:
+                raise RuntimeError(
+                    "USE_OPENROUTER is true but OPENROUTER_API_KEY is not set in .env"
+                )
+            _client = OpenAI(
+                api_key=openrouter_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
         else:
-            _client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+            groq_key = os.environ.get("GROQ_API_KEY")
+            if groq_key:
+                _client = OpenAI(
+                    api_key=groq_key,
+                    base_url="https://api.groq.com/openai/v1",
+                )
+            else:
+                _client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     return _client
 
 
@@ -53,7 +89,7 @@ def call_llm(system: str,
     full_messages = [{"role": "system", "content": system}] + messages
 
     kwargs = {
-        "model": model or MODEL,
+        "model": model or _default_model(),
         "messages": full_messages,
         "max_tokens": max_tokens,
         "temperature": temperature,
