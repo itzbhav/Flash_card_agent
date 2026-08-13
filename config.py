@@ -47,6 +47,7 @@ class HarnessConfig:
     retry: RetryConfig = field(default_factory=RetryConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     guardrails: GuardrailConfig = field(default_factory=GuardrailConfig)
+    score_threshold: float = 8.5
     log_dir: str = "logs"
     verbose: bool = True
 
@@ -57,6 +58,7 @@ class HarnessConfig:
 # env var -> (dotted attribute path, caster)
 _ENV_OVERRIDES = {
     "FLASHCARD_MODEL": ("model", str),
+    "FLASHCARD_SCORE_THRESHOLD": ("score_threshold", float),
     "FLASHCARD_MAX_ITERATIONS": ("guardrails.max_iterations", int),
     "FLASHCARD_TOKEN_BUDGET": ("guardrails.token_budget", int),
     "FLASHCARD_MAX_RETRIES": ("retry.max_retries", int),

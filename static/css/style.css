@@ -230,11 +230,38 @@ body {
 }
 .small-icon { width: 14px; height: 14px; }
 
-.card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-.card-front h2 { font-size: 1.25rem; font-weight: 600; line-height: 1.5; }
-.card-back .answer { font-size: 1.1rem; font-weight: 500; line-height: 1.6; color: #e2e8f0; }
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+    overflow-y: auto;
+    max-height: 270px;
+    padding-right: 0.3rem;
+    margin: 0.5rem 0;
+}
 
-.card-footer { text-align: center; margin-top: auto; padding-top: 1rem; opacity: 0.4; transition: opacity 0.3s; }
+/* Custom scrollbar for flashcards */
+.card-body::-webkit-scrollbar {
+    width: 4px;
+}
+.card-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}
+
+.card-front h2 { font-size: 1.15rem; font-weight: 600; line-height: 1.5; margin: auto 0; }
+.card-back .answer { font-size: 1.05rem; font-weight: 500; line-height: 1.6; color: #e2e8f0; }
+
+.card-footer { text-align: center; margin-top: auto; padding-top: 0.75rem; opacity: 0.6; transition: opacity 0.3s; flex-shrink: 0; }
 .flashcard-container:hover .card-footer { opacity: 1; }
 .click-hint { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; justify-content: center; gap: 0.3rem; color: var(--text-muted); }
 
@@ -253,7 +280,7 @@ body {
 }
 
 .feedback-section {
-    margin-top: 1.25rem;
+    margin-top: 1rem;
     padding: 0.75rem;
     background: rgba(255,255,255,0.03);
     border-radius: var(--radius-sm);
@@ -1168,5 +1195,196 @@ body {
 }
 .pill-btn.pill-actor.active { background: var(--accent-indigo); border-color: var(--accent-indigo); }
 .pill-btn.pill-judge.active { background: var(--accent-pink); border-color: var(--accent-pink); }
+
+/* ---- Judge Audit Summary Banner ---- */
+.judge-audit-banner {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    backdrop-filter: blur(16px);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+.audit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.audit-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.audit-icon {
+    color: var(--accent-green);
+    width: 20px;
+    height: 20px;
+}
+.audit-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+.audit-metric-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.metric-label {
+    font-size: 0.725rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.metric-val {
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+.metric-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* ---- Deck Filter Bar ---- */
+.deck-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+}
+.filter-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ---- PDF Dropzone Styles ---- */
+.pdf-dropzone {
+    border: 2px dashed rgba(59, 130, 246, 0.35);
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 1.25rem;
+}
+.pdf-dropzone:hover, .pdf-dropzone.drag-active {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateY(-1px);
+}
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+.dropzone-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--accent-blue);
+}
+.dropzone-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.dropzone-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.dropzone-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.divider-or {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.25rem 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+.divider-or::before, .divider-or::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.divider-or span {
+    padding: 0 0.75rem;
+}
+
+.pdf-status-pill {
+    background: var(--bg-card);
+    border: 1px solid var(--accent-blue);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.pdf-info-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.pdf-pill-icon {
+    color: var(--accent-blue);
+    width: 24px;
+    height: 24px;
+}
+.pdf-pill-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+.pdf-filename {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+.pdf-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.btn-remove-pdf {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+.btn-remove-pdf:hover {
+    color: var(--accent-red);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+
+
 
 

@@ -183,27 +183,75 @@ def index():
     data = _load_flashcards()
     if data:
         topic = data.get("topic", "Flashcards")
-        flashcards = data.get("flashcards", [])
+        all_flashcards = data.get("flashcards", [])
+        passed_cards = [c for c in all_flashcards if c.get("passed", c.get("final_score", 0) >= 8.5)]
         stats = {
-            "count": data.get("count", len(flashcards)),
+            "count": len(all_flashcards),
+            "passed_count": len(passed_cards),
             "iterations": data.get("iterations", 0),
             "completed": data.get("completed", False),
             "stop_reason": data.get("stop_reason", "unknown"),
         }
     else:
         topic = "No flashcards generated yet"
-        flashcards = []
+        all_flashcards = []
         stats = {}
 
-    return render_template("index.html", topic=topic, flashcards=flashcards, stats=stats)
+    return render_template("index.html", topic=topic, flashcards=all_flashcards, stats=stats)
+
+
+import pypdf
+
+@app.route("/api/extract-pdf", methods=["POST"])
+def extract_pdf():
+    """Extract text from an uploaded PDF file."""
+    if "pdf_file" not in request.files:
+        return jsonify({"error": "No PDF file uploaded."}), 400
+
+    file = request.files["pdf_file"]
+    if not file or not file.filename.lower().endswith(".pdf"):
+        return jsonify({"error": "Invalid file type. Please upload a PDF file."}), 400
+
+    try:
+        reader = pypdf.PdfReader(file.stream)
+        text_pages = []
+        for idx, page in enumerate(reader.pages):
+            page_text = page.extract_text() or ""
+            if page_text.strip():
+                text_pages.append(f"--- Page {idx + 1} ---\n{page_text.strip()}")
+
+        full_text = "\n\n".join(text_pages).strip()
+        if not full_text:
+            return jsonify({"error": "Could not extract readable text from PDF. The PDF may be scanned or image-only."}), 400
+
+        return jsonify({
+            "filename": file.filename,
+            "pages": len(reader.pages),
+            "text": full_text,
+            "char_count": len(full_text),
+            "word_count": len(full_text.split())
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to parse PDF: {str(e)}"}), 500
 
 
 @app.route("/run", methods=["POST"])
 def start_run():
-    """Accept study material and kick off the agent in a background thread."""
+    """Accept study material or uploaded PDF and kick off the agent in a background thread."""
     material = request.form.get("material", "").strip()
+
+    if not material and "pdf_file" in request.files:
+        file = request.files["pdf_file"]
+        if file and file.filename.lower().endswith(".pdf"):
+            try:
+                reader = pypdf.PdfReader(file.stream)
+                text_pages = [page.extract_text() or "" for page in reader.pages]
+                material = "\n\n".join(text_pages).strip()
+            except Exception as e:
+                return jsonify({"error": f"Failed to read PDF file: {str(e)}"}), 400
+
     if not material:
-        return jsonify({"error": "Please provide study material."}), 400
+        return jsonify({"error": "Please provide study material or upload a readable PDF file."}), 400
 
     run_id = "run_" + uuid.uuid4().hex[:8]
     _run_events[run_id] = queue.Queue()

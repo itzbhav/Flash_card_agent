@@ -93,7 +93,14 @@ _ACTOR_GENERATE_SYS = (
 )
 
 def handle_generate_flashcards(concept: str, source: str = "", n_variants: int = 1,
-                               harness=None) -> dict:
+                               harness=None, threshold: float | None = None) -> dict:
+    target_threshold = threshold
+    if target_threshold is None:
+        if harness and hasattr(harness, "config") and hasattr(harness.config, "score_threshold"):
+            target_threshold = harness.config.score_threshold
+        else:
+            target_threshold = 8.5
+
     variants = []
     for _ in range(max(1, n_variants)):
         # ACTOR
@@ -116,17 +123,21 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
             if harness and getattr(harness, "logger", None):
                 harness.logger.actor_draft(iteration=i, concept=concept, front=draft["front"], back=draft["back"], revision=i)
 
-            eval_res = handle_judge_flashcard(draft["front"], draft["back"], concept, source, harness=harness)
+            eval_res = handle_judge_flashcard(draft["front"], draft["back"], concept, source, harness=harness, threshold=target_threshold)
             
             if harness and getattr(harness, "logger", None):
                 harness.logger.judge_eval(
                     iteration=i, concept=concept,
                     scores={
                         "accuracy": eval_res["accuracy"], "relevance": eval_res["relevance"],
-                        "clarity": eval_res["clarity"], "atomicity/conciseness": eval_res["conciseness"]
+                        "clarity": eval_res["clarity"], "completeness": eval_res["completeness"],
+                        "pedagogical_value": eval_res["pedagogical_value"],
+                        "atomicity/conciseness": eval_res["conciseness"]
                     },
+                    score=eval_res["score"],
                     feedback=eval_res["feedback"],
-                    passed=eval_res["pass"]
+                    passed=eval_res["pass"],
+                    threshold=target_threshold
                 )
 
             # Store version history with judge evaluation
@@ -184,7 +195,8 @@ def handle_generate_flashcards(concept: str, source: str = "", n_variants: int =
             "final_score": final_score,
             "judge_feedback": judge_feedback,
             "actor_model": _default_model(),
-            "judge_model": _default_model()
+            "judge_model": _default_model(),
+            "passed": eval_res.get("pass", False) or (final_score >= 8.5)
         })
         
     return {"variants": variants, "count": len(variants)}
@@ -211,7 +223,15 @@ _JUDGE_SYS = (
 )
 
 def handle_judge_flashcard(front: str, back: str, concept: str = "", source: str = "",
-                           harness=None) -> dict:
+                           harness=None, threshold: float | None = None) -> dict:
+    if threshold is None:
+        if harness and hasattr(harness, "config") and hasattr(harness.config, "score_threshold"):
+            target_threshold = harness.config.score_threshold
+        else:
+            target_threshold = 8.5
+    else:
+        target_threshold = threshold
+
     user = (f"Concept: {concept}\nSource: {source}\nFRONT: {front}\nBACK: {back}\n\n"
             "Score this card using the 6-dimension rubric.")
     data = _llm_json(_JUDGE_SYS, user, max_tokens=500, harness=harness)
@@ -227,8 +247,8 @@ def handle_judge_flashcard(front: str, back: str, concept: str = "", source: str
     # Accuracy 25%, Relevance 15%, Clarity 15%, Completeness 20%, Pedagogical Value 15%, Conciseness 10%
     score = (acc * 0.25) + (rel * 0.15) + (cla * 0.15) + (com * 0.20) + (ped * 0.15) + (con * 0.10)
     
-    # 8.5 threshold strictly enforced in Python
-    passed = score >= 8.5
+    # Target threshold strictly enforced in Python
+    passed = score >= target_threshold
     
     return {
         "accuracy": acc,
@@ -238,6 +258,7 @@ def handle_judge_flashcard(front: str, back: str, concept: str = "", source: str
         "pedagogical_value": ped,
         "conciseness": con,
         "score": score,
+        "threshold": target_threshold,
         "feedback": data.get("feedback", ""),
         "pass": passed,
         "verdict": "keep" if passed else "revise"

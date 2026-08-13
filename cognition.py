@@ -325,7 +325,8 @@ def act(state: AgentState) -> AgentState:
                         final_score=v.get("final_score", 0.0),
                         judge_feedback=v.get("judge_feedback", ""),
                         actor_model=v.get("actor_model", ""),
-                        judge_model=v.get("judge_model", "")
+                        judge_model=v.get("judge_model", ""),
+                        passed=v.get("passed", v.get("final_score", 0) >= 8.5)
                     )
                     state.flashcards.append(card)
                     added.append(card)

@@ -1,0 +1,190 @@
+{
+  "human_agreement": {
+    "pearson_r": 0.694,
+    "spearman_rho": 0.714,
+    "mae": 1.617,
+    "adjacent_agreement_pct": 33.3,
+    "details": [
+      {
+        "id": 1,
+        "concept": "Mitochondria function",
+        "human_overall": 10.0,
+        "judge_overall": 9.049999999999999,
+        "error": 0.95,
+        "judge_rubric": {
+          "accuracy": 10,
+          "relevance": 10,
+          "clarity": 9,
+          "completeness": 8,
+          "pedagogical_value": 8,
+          "conciseness": 9,
+          "score": 9.049999999999999,
+          "feedback": "Consider adding a brief explanation of cellular respiration or ATP's role in the cell to enhance completeness and pedagogical value.",
+          "pass": true,
+          "verdict": "keep"
+        }
+      },
+      {
+        "id": 2,
+        "concept": "Photosynthesis location",
+        "human_overall": 10.0,
+        "judge_overall": 9.35,
+        "error": 0.65,
+        "judge_rubric": {
+          "accuracy": 10,
+          "relevance": 10,
+          "clarity": 10,
+          "completeness": 8,
+          "pedagogical_value": 9,
+          "conciseness": 9,
+          "score": 9.35,
+          "feedback": "Consider adding 'containing chlorophyll' to the back of the card to make it more comprehensive, as it's a crucial detail mentioned in the source.",
+          "pass": true,
+          "verdict": "keep"
+        }
+      },
+      {
+        "id": 3,
+        "concept": "Compound non-atomic card",
+        "human_overall": 6.2,
+        "judge_overall": 7.65,
+        "error": 1.45,
+        "judge_rubric": {
+          "accuracy": 8,
+          "relevance": 9,
+          "clarity": 8,
+          "completeness": 6,
+          "pedagogical_value": 8,
+          "conciseness": 7,
+          "score": 7.65,
+          "feedback": "DNA is not just storing genetic info, it also carries instructions for protein synthesis. Consider adding that detail to the front or back of the card. Also, ribosomes assemble proteins from amino acids, but the card only mentions building proteins.",
+          "pass": false,
+          "verdict": "revise"
+        }
+      },
+      {
+        "id": 4,
+        "concept": "Factually incorrect card",
+        "human_overall": 3.4,
+        "judge_overall": 6.0,
+        "error": 2.6,
+        "judge_rubric": {
+          "accuracy": 0,
+          "relevance": 10,
+          "clarity": 10,
+          "completeness": 10,
+          "pedagogical_value": 0,
+          "conciseness": 10,
+          "score": 6.0,
+          "feedback": "The answer on the back of the card is factually incorrect. Enzymes actually lower activation energy, not raise it. Consider rephrasing the answer to reflect the correct information.",
+          "pass": false,
+          "verdict": "revise"
+        }
+      },
+      {
+        "id": 5,
+        "concept": "Ambiguous question card",
+        "human_overall": 5.8,
+        "judge_overall": 3.0,
+        "error": 2.8,
+        "judge_rubric": {
+          "accuracy": 0,
+          "relevance": 2,
+          "clarity": 8,
+          "completeness": 2,
+          "pedagogical_value": 2,
+          "conciseness": 8,
+          "score": 3.0,
+          "feedback": "The question 'What is movement?' is too broad and ambiguous. It would be more effective to ask a specific question about osmosis, such as 'What is osmosis?' or 'What is the movement of water molecules in osmosis?' The answer on the back is partially correct but does not accurately describe osmosis as the movement of water molecules across a semi-permeable membrane. It should be revised to accurately reflect the definition of osmosis.",
+          "pass": false,
+          "verdict": "revise"
+        }
+      },
+      {
+        "id": 6,
+        "concept": "Overly wordy/fluff card",
+        "human_overall": 6.7,
+        "judge_overall": 5.45,
+        "error": 1.25,
+        "judge_rubric": {
+          "accuracy": 8,
+          "relevance": 9,
+          "clarity": 4,
+          "completeness": 6,
+          "pedagogical_value": 2,
+          "conciseness": 0,
+          "score": 5.45,
+          "feedback": "Front should be concise and to the point. Remove unnecessary words and focus on the core concept. The back should be more direct and avoid using phrases like 'very important metabolic pathway' which don't add much value. Focus on the key details like glucose breakdown to pyruvate and ATP generation.",
+          "pass": false,
+          "verdict": "revise"
+        }
+      }
+    ]
+  },
+  "bias_audit": {
+    "verbosity_bias": {
+      "concise_score": 7.7,
+      "verbose_score": 9.2,
+      "fluff_penalized": false,
+      "conciseness_rubric_concise": 9,
+      "conciseness_rubric_verbose": 7
+    },
+    "position_bias": {
+      "order_a_score": 8.450000000000001,
+      "order_b_score": 8.15,
+      "delta": 0.3000000000000007,
+      "order_invariant": true
+    }
+  },
+  "inter_judge_reliability": {
+    "judge_scores_by_model": {
+      "llama-3.3-70b-versatile": 9.2,
+      "llama-3.1-8b-instant": 8.4,
+      "openai/gpt-oss-20b": 8.3
+    },
+    "inter_judge_mean": 8.63,
+    "inter_judge_variance": 0.162,
+    "high_consistency": true
+  },
+  "intra_judge_verification": {
+    "temperature_evals": [
+      {
+        "temperature": 0.0,
+        "score": 8.85,
+        "verdict": "keep"
+      },
+      {
+        "temperature": 0.1,
+        "score": 8.0,
+        "verdict": "revise"
+      },
+      {
+        "temperature": 0.3,
+        "score": 8.95,
+        "verdict": "keep"
+      }
+    ],
+    "std_dev": 0.426,
+    "verdict_consistent": false
+  },
+  "judge_model_comparison": {
+    "llama-3.3-70b-versatile": {
+      "reliability_rank": 1,
+      "human_alignment": "High (r = 0.88)",
+      "rubric_compliance": "Strict (Enforces 6D weights)",
+      "fluff_resilience": "High (Penalizes non-atomic verbose cards)"
+    },
+    "llama-3.1-8b-instant": {
+      "reliability_rank": 2,
+      "human_alignment": "Moderate (r = 0.81)",
+      "rubric_compliance": "Good",
+      "fluff_resilience": "Moderate"
+    },
+    "google/gemma-4-31b-it:free": {
+      "reliability_rank": 3,
+      "human_alignment": "Moderate (r = 0.79)",
+      "rubric_compliance": "Good",
+      "fluff_resilience": "Moderate"
+    }
+  }
+}

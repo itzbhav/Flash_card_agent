@@ -23,6 +23,7 @@ class Flashcard:
     judge_feedback: str = ""       # final feedback from the judge
     actor_model: str = ""          # model used to generate/revise
     judge_model: str = ""          # model used to score
+    passed: bool = True            # whether the card passed the Judge 8.5+ threshold
  
     def to_dict(self) -> dict:
         return asdict(self)

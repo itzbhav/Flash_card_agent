@@ -109,7 +109,7 @@ class StructuredLogger:
         if self.verbose:
             print(f"  [Actor] Draft (rev {revision}): concept='{concept}' | front='{front[:40]}...'")
 
-    def judge_eval(self, iteration: int, concept: str, scores: dict, feedback: str, passed: bool, rubric: list[str] | None = None) -> None:
+    def judge_eval(self, iteration: int, concept: str, scores: dict, feedback: str, passed: bool, rubric: list[str] | None = None, threshold: float = 8.5, score: float | None = None) -> None:
         """Log an explicit Judge evaluation step against a named rubric."""
         self._write({
             "kind": "judge_output",
@@ -117,13 +117,16 @@ class StructuredLogger:
             "iteration": iteration,
             "concept": concept,
             "scores": scores,
-            "rubric": rubric or ["Accuracy", "Clarity", "Atomicity"],
+            "score": score,
+            "rubric": rubric or ["Accuracy", "Relevance", "Clarity", "Completeness", "Pedagogical Value", "Conciseness/Atomicity"],
             "feedback": feedback,
-            "passed": passed
+            "passed": passed,
+            "threshold": threshold
         })
         if self.verbose:
             verdict = "PASS" if passed else "REVISE"
-            print(f"  [Judge] Verdict: {verdict} | Scores: {scores} | Feedback: {feedback[:50]}...")
+            score_str = f"{score:.1f}" if score is not None else "?"
+            print(f"  [Judge] Verdict: {verdict} (Score: {score_str}/10 | Threshold: {threshold}) | Scores: {scores} | Feedback: {feedback[:50]}...")
 
     def revision_step(self, iteration: int, concept: str, revision: int, prev_front: str, new_front: str) -> None:
         """Log a revision transition step taking judge feedback into account."""
