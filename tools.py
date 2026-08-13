@@ -10,7 +10,7 @@ Each tool is annotated with the reasoning pattern it exists to serve:
 from __future__ import annotations
 
 import json
-from llm import call_llm, extract_text
+from llm import call_llm, extract_text, MODEL
 
 
 # ----------------------------------------------------------------------------
@@ -85,45 +85,144 @@ def handle_extract_key_concepts(chunk_text: str, max_concepts: int = 5,
 # ============================================================================
 # TOOL 2 — generate_flashcards   (pattern: Tree-of-Thoughts hook)
 # ============================================================================
-_GENERATE_SYS = (
-    "You write high-quality flashcards. A good card is atomic (tests one idea), "
-    "has an unambiguous answer, and the front does not give away the back. "
-    "When asked for multiple variants, make them genuinely different in angle or "
-    "phrasing (e.g. definition vs. application vs. compare/contrast), not reworded "
-    "duplicates. "
-    'Return JSON: {"variants": [{"front": str, "back": str, '
-    '"difficulty": "easy|medium|hard"}]}'
+_ACTOR_GENERATE_SYS = (
+    "You are an expert flashcard creator. Your goal is to write a high-quality, atomic flashcard (front and back) "
+    "based on the provided concept and source text. "
+    "Make the card genuinely different in angle or phrasing if asked for multiple variants. "
+    'Return JSON: {"front": str, "back": str, "difficulty": "easy|medium|hard"}'
 )
 
 def handle_generate_flashcards(concept: str, source: str = "", n_variants: int = 1,
                                harness=None) -> dict:
-    user = (f"Concept to test: {concept}\n"
-            f"Number of distinct card variants to produce: {n_variants}\n")
-    if source:
-        user += f"Grounding text (do not invent facts beyond this):\n{source}"
-    data = _llm_json(_GENERATE_SYS, user, harness=harness)
-    variants = data.get("variants", [])[:max(1, n_variants)]
+    variants = []
+    for _ in range(max(1, n_variants)):
+        # ACTOR
+        user = f"Concept to test: {concept}\nGrounding text:\n{source}"
+        data = _llm_json(_ACTOR_GENERATE_SYS, user, harness=harness)
+        draft = {
+            "front": data.get("front", ""), 
+            "back": data.get("back", ""), 
+            "difficulty": data.get("difficulty", "medium")
+        }
+        
+        versions = []
+        revision_count = 0
+        best_score = -1.0
+        best_draft = draft.copy()
+        best_judge_result = {}
+        
+        # JUDGE + REVISE LOOP
+        for i in range(3):  # MAX_REVISIONS = 3
+            eval_res = handle_judge_flashcard(draft["front"], draft["back"], concept, source, harness=harness)
+            
+            # Store version history with judge evaluation
+            version_record = {
+                "draft": draft.copy(),
+                "judge_evaluation": eval_res
+            }
+            versions.append(version_record)
+            
+            final_score = eval_res["score"]
+            judge_feedback = eval_res["feedback"]
+            
+            # Keep track of the best scoring version
+            if final_score > best_score:
+                best_score = final_score
+                best_draft = draft.copy()
+                best_judge_result = eval_res
+            
+            # Print logs for progression/before-after tracking
+            print(f"[Actor-Critic] Iteration {i+1} for '{concept}'")
+            print(f"Draft: Q: {draft['front']} | A: {draft['back']}")
+            print(f"Judge Scores: Acc={eval_res['accuracy']}, Rel={eval_res['relevance']}, Cla={eval_res['clarity']}, Com={eval_res['completeness']}, Ped={eval_res['pedagogical_value']}, Con={eval_res['conciseness']} -> Weighted Final: {final_score:.1f}/10")
+            print(f"Feedback: {judge_feedback}")
+            print(f"Pass: {eval_res['pass']}\n")
+            
+            if eval_res["pass"]:
+                break
+                
+            # ACTOR REVISION
+            rev_user = (f"CURRENT FRONT: {draft['front']}\nCURRENT BACK: {draft['back']}\n\n"
+                        f"CRITIQUE TO ADDRESS:\n{judge_feedback}\n\nProduce the improved card.")
+            rev_data = _llm_json(_REVISE_SYS, rev_user, max_tokens=500, harness=harness)
+            draft["front"] = rev_data.get("front", draft["front"])
+            draft["back"] = rev_data.get("back", draft["back"])
+            draft["difficulty"] = rev_data.get("difficulty", draft.get("difficulty", "medium"))
+            revision_count += 1
+            
+        # Fallback to the best scoring version if threshold wasn't reached
+        if not best_judge_result.get("pass", False) and revision_count == 3:
+            print(f"[Actor-Critic] Max revisions reached. Falling back to highest-scoring version ({best_score:.1f}).")
+            draft = best_draft
+            final_score = best_score
+            judge_feedback = best_judge_result.get("feedback", "")
+            
+        variants.append({
+            "front": draft["front"],
+            "back": draft["back"],
+            "difficulty": draft["difficulty"],
+            "versions": versions,
+            "revision_count": revision_count,
+            "final_score": final_score,
+            "judge_feedback": judge_feedback,
+            "actor_model": MODEL,
+            "judge_model": MODEL
+        })
+        
     return {"variants": variants, "count": len(variants)}
 
 
 # ============================================================================
 # TOOL 3 — score_flashcard   (pattern: value function for ToT )
 # ============================================================================
-_SCORE_SYS = (
-    "You are a strict flashcard reviewer. Score a single card 0-10 on: atomicity "
-    "(one idea), clarity, correctness, and whether the front leaks the answer. "
-    'Return JSON: {"score": int, "reasons": str, "verdict": "keep|revise|drop"}.'
+_JUDGE_SYS = (
+    "You are a strict, independent LLM-as-Judge. Evaluate the provided flashcard draft against the source material "
+    "using the following rubric. Assign an integer score from 0 to 10 for each dimension:\n"
+    "1. Accuracy (0-10): Is the answer factually correct according to the source?\n"
+    "2. Relevance (0-10): How relevant is this to the core topic?\n"
+    "3. Clarity (0-10): Is the question unambiguous and the answer clear?\n"
+    "4. Completeness (0-10): Does it cover the necessary aspect of the idea without missing key info?\n"
+    "5. Pedagogical Value (0-10): Is this card actually useful for learning/testing?\n"
+    "6. Conciseness (0-10): Is it brief and to the point?\n\n"
+    "Return JSON ONLY:\n"
+    "{\n"
+    "  \"accuracy\": int, \"relevance\": int, \"clarity\": int,\n"
+    "  \"completeness\": int, \"pedagogical_value\": int, \"conciseness\": int,\n"
+    "  \"feedback\": \"<specific actionable feedback>\"\n"
+    "}"
 )
 
-def handle_score_flashcard(front: str, back: str, concept: str = "",
+def handle_judge_flashcard(front: str, back: str, concept: str = "", source: str = "",
                            harness=None) -> dict:
-    user = (f"Concept: {concept}\nFRONT: {front}\nBACK: {back}\n\n"
-            "Score this card.")
-    data = _llm_json(_SCORE_SYS, user, max_tokens=400, harness=harness)
+    user = (f"Concept: {concept}\nSource: {source}\nFRONT: {front}\nBACK: {back}\n\n"
+            "Score this card using the 6-dimension rubric.")
+    data = _llm_json(_JUDGE_SYS, user, max_tokens=500, harness=harness)
+    
+    acc = data.get("accuracy", 0)
+    rel = data.get("relevance", 0)
+    cla = data.get("clarity", 0)
+    com = data.get("completeness", 0)
+    ped = data.get("pedagogical_value", 0)
+    con = data.get("conciseness", 0)
+    
+    # Weighted average logic strictly enforced in Python:
+    # Accuracy 25%, Relevance 15%, Clarity 15%, Completeness 20%, Pedagogical Value 15%, Conciseness 10%
+    score = (acc * 0.25) + (rel * 0.15) + (cla * 0.15) + (com * 0.20) + (ped * 0.15) + (con * 0.10)
+    
+    # 8.5 threshold strictly enforced in Python
+    passed = score >= 8.5
+    
     return {
-        "score": int(data.get("score", 0)),
-        "reasons": data.get("reasons", ""),
-        "verdict": data.get("verdict", "keep"),
+        "accuracy": acc,
+        "relevance": rel,
+        "clarity": cla,
+        "completeness": com,
+        "pedagogical_value": ped,
+        "conciseness": con,
+        "score": score,
+        "feedback": data.get("feedback", ""),
+        "pass": passed,
+        "verdict": "keep" if passed else "revise"
     }
 
 
@@ -233,10 +332,10 @@ TOOL_SCHEMAS = [
         },
     },
     {
-        "name": "score_flashcard",
+        "name": "judge_flashcard",
         "description": (
-            "Rate one flashcard 0-10 with reasons and a keep/revise/drop verdict. "
-            "Use to pick the best variant, or to check a card before finalizing."
+            "Rate one flashcard draft using a strict rubric on accuracy, clarity, and atomicity. "
+            "Returns 0-10 dimension scores, weighted score, feedback, and pass/fail verdict."
         ),
         "input_schema": {
             "type": "object",
@@ -288,7 +387,7 @@ TOOL_SCHEMAS = [
 HANDLERS = {
     "extract_key_concepts": handle_extract_key_concepts,
     "generate_flashcards": handle_generate_flashcards,
-    "score_flashcard": handle_score_flashcard,
+    "judge_flashcard": handle_judge_flashcard,
     "revise_flashcard": handle_revise_flashcard,
     "review_deck": handle_review_deck,
 }

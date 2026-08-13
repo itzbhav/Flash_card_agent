@@ -1,11 +1,11 @@
 {
-  "model": "gpt-4o",
+  "model": "llama-3.3-70b-versatile",
   "log_dir": "logs",
   "verbose": true,
   "retry": {
-    "max_retries": 4,
+    "max_retries": 8,
     "base_delay": 1.0,
-    "max_delay": 20.0,
+    "max_delay": 120.0,
     "jitter": 0.5
   },
   "memory": {

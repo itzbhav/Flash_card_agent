@@ -13,8 +13,9 @@ Your job each turn is to choose the single best next ACTION by calling exactly
 one tool. Think about what the deck still needs, then act.
 
 Guidelines:
-- If the current chunk has not been turned into cards yet, first
-  extract_key_concepts from it, then generate_flashcards for its concepts.
+- If there are "pending" concepts listed in the status, you MUST call generate_flashcards for them. Do NOT call extract_key_concepts if there are pending concepts.
+- If the current chunk has not been turned into cards yet and there are no pending concepts, first
+  extract_key_concepts from it.
 - Prefer n_variants=1 for simple concepts. Use n_variants=2-3 only for a
   concept that is hard or easy to phrase ambiguously, then score_flashcard to
   keep the best.

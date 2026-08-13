@@ -273,7 +273,11 @@ def act(state: AgentState) -> AgentState:
         if name == "extract_key_concepts":
             idx = args.get("chunk_index", state.working_chunk_index)
             chunk = next((c for c in p.chunks if c.id == idx), p.next_uncovered())
-            if chunk is None:
+            if state.pending_concepts:
+                # GUARD: force the agent to drain concepts before extracting again.
+                obs = (f"Cannot extract from chunk {idx} while there are pending concepts. "
+                       f"Use 'generate_flashcards' to drain them first: {state.pending_concepts}")
+            elif chunk is None:
                 obs = "No chunk left to extract from."
             elif chunk.extracted:
                 # GUARD: never re-extract (that would wipe pending progress).
@@ -316,6 +320,12 @@ def act(state: AgentState) -> AgentState:
                         concept=concept,
                         difficulty=v.get("difficulty", "medium"),
                         source=source[:160],
+                        versions=v.get("versions", []),
+                        revision_count=v.get("revision_count", 0),
+                        final_score=v.get("final_score", 0.0),
+                        judge_feedback=v.get("judge_feedback", ""),
+                        actor_model=v.get("actor_model", ""),
+                        judge_model=v.get("judge_model", "")
                     )
                     state.flashcards.append(card)
                     added.append(card)

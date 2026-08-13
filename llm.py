@@ -10,16 +10,20 @@ load_dotenv()
 
 # Set this to whatever model your key can access (e.g. "gpt-4o", "gpt-4o-mini",
 # "gpt-4.1"). Kept in one place so it's trivial to change.
-MODEL = "gpt-4o"
+MODEL = "llama-3.3-70b-versatile"
 
 _client = None  # created on first use so this module imports without a key
 
 
 def _get_client() -> OpenAI:
-    """Create the OpenAI client on first call (needs OPENAI_API_KEY)."""
+    """Create the OpenAI client on first call. Supports Groq via OpenAI client."""
     global _client
     if _client is None:
-        _client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        groq_key = os.environ.get("GROQ_API_KEY")
+        if groq_key:
+            _client = OpenAI(api_key=groq_key, base_url="https://api.groq.com/openai/v1")
+        else:
+            _client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     return _client
 
 
