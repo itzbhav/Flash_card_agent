@@ -1,0 +1,21 @@
+{
+  "model": "gpt-4o",
+  "log_dir": "logs",
+  "verbose": true,
+  "retry": {
+    "max_retries": 4,
+    "base_delay": 1.0,
+    "max_delay": 20.0,
+    "jitter": 0.5
+  },
+  "memory": {
+    "backend": "json_file",
+    "path": "memory_store.json"
+  },
+  "guardrails": {
+    "max_iterations": 15,
+    "token_budget": 60000,
+    "stuck_window": 4,
+    "stuck_threshold": 3
+  }
+}

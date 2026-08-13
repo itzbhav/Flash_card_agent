@@ -180,4 +180,5 @@ logs/<session_id>.jsonl     Structured per-step logs
 
 `main.py` exits with code `1` on anything but `task_complete`, so an unsupervised caller (cron, CI) can detect an incomplete run without parsing logs.
 #   F l a s h _ c a r d _ a g e n t  
+ #   F l a s h _ c a r d _ a g e n t  
  
