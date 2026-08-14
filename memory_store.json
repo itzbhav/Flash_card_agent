@@ -2482,5 +2482,545 @@
     "front": "(reflection note)",
     "back": "Drain pending concepts by generating flashcards for the extracted concepts before attempting to extract key concepts again.",
     "created_at": "2026-08-14 00:09:58"
+  },
+  {
+    "id": "a0d1f9fa",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has successfully extracted key concepts from the first chunk, and the next step is to create flashcards based on these concepts to start building the deck.",
+    "created_at": "2026-08-14 09:28:37"
+  },
+  {
+    "id": "8f1d2aa4",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering",
+    "front": "What is the primary goal of Data Engineering?",
+    "back": "To collect, store, transform, and manage data for effective analysis and decision-making",
+    "created_at": "2026-08-14 09:28:42"
+  },
+  {
+    "id": "4d8501cb",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Progress has started with the generation of the first flashcard, but there is still much work to be done to cover all material chunks and review the deck.",
+    "created_at": "2026-08-14 09:28:42"
+  },
+  {
+    "id": "fac90a28",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Ingestion",
+    "front": "What is the primary function of data ingestion?",
+    "back": "Collecting data from various sources such as databases, APIs, files, and streaming systems.",
+    "created_at": "2026-08-14 09:28:45"
+  },
+  {
+    "id": "b29d89cd",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Progress is slow, consider increasing the number of variants or covering more material chunks in the next iteration to accelerate the flashcard creation process.",
+    "created_at": "2026-08-14 09:28:45"
+  },
+  {
+    "id": "17ebb987",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Processing",
+    "front": "What are the three major stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage",
+    "created_at": "2026-08-14 09:28:48"
+  },
+  {
+    "id": "c64cf8bf",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "Progress is slow, consider increasing the number of variants or covering more concepts to accelerate material coverage, focusing on the remaining chunks of the Data Engineering process.",
+    "created_at": "2026-08-14 09:28:48"
+  },
+  {
+    "id": "66d80ff6",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Storage",
+    "front": "What are the three major stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage",
+    "created_at": "2026-08-14 09:28:59"
+  },
+  {
+    "id": "1aed9e0e",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter4",
+    "front": "(reflection note)",
+    "back": "Progress is slow, consider increasing 'n_variants' or adding more concepts to generate flashcards more efficiently, focusing on covering all material chunks.",
+    "created_at": "2026-08-14 09:28:59"
+  },
+  {
+    "id": "bf4f4ccd",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Pipeline",
+    "front": "What are the primary stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage",
+    "created_at": "2026-08-14 09:29:14"
+  },
+  {
+    "id": "003cce7a",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter5",
+    "front": "(reflection note)",
+    "back": "The material coverage is complete, but the deck has only been partially reviewed and there may be unresolved weak cards, so continue reviewing and refining the deck.",
+    "created_at": "2026-08-14 09:29:14"
+  },
+  {
+    "id": "2d1ad18d",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter6",
+    "front": "(reflection note)",
+    "back": "The deck review indicates that the material has been covered, but duplicate cards need to be removed to avoid repetition and reinforce learning, so remove duplicates 2, 3, and 4 to improve the deck.",
+    "created_at": "2026-08-14 09:29:22"
+  },
+  {
+    "id": "7b54154e",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter7",
+    "front": "(reflection note)",
+    "back": "The revision of card 2 has improved its quality, but the task is not complete since the deck has not been reviewed and there may be unresolved weak cards remaining, so proceed with reviewing the deck.",
+    "created_at": "2026-08-14 09:29:25"
+  },
+  {
+    "id": "a02d75f4",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter8",
+    "front": "(reflection note)",
+    "back": "The deck review indicates that while all material chunks are covered, duplicates need to be removed and more nuanced questions could be added, so consider refining the deck to improve its quality.",
+    "created_at": "2026-08-14 09:29:32"
+  },
+  {
+    "id": "b6de3488",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter9",
+    "front": "(reflection note)",
+    "back": "The revision of card 3 has improved its quality, but the task is still incomplete since the deck has not been fully reviewed and there may be unresolved weak cards remaining, so continue reviewing the deck to identify any weak cards.",
+    "created_at": "2026-08-14 09:29:35"
+  },
+  {
+    "id": "2cb1f6c9",
+    "session_id": "sess_022fc738",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter10",
+    "front": "(reflection note)",
+    "back": "The deck review indicates that while all material chunks are covered, the deck still needs work due to weak cards, so add more specific questions and clarify or remove near-duplicate cards to improve the deck quality.",
+    "created_at": "2026-08-14 09:29:39"
+  },
+  {
+    "id": "079c3730",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has successfully extracted key concepts from the first chunk, now it should create flashcards for these concepts to start building the deck.",
+    "created_at": "2026-08-14 09:33:19"
+  },
+  {
+    "id": "9ee6bdc9",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering",
+    "front": "What is the primary goal of Data Engineering?",
+    "back": "To collect, store, transform, and manage data for effective analysis and decision-making",
+    "created_at": "2026-08-14 09:33:22"
+  },
+  {
+    "id": "680d7fc0",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "The task has just begun, and only one card has been generated so far, so the next step should be to generate more flashcards to cover the remaining material chunks.",
+    "created_at": "2026-08-14 09:33:22"
+  },
+  {
+    "id": "8783a9d4",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Ingestion",
+    "front": "What is the first stage in a typical data pipeline?",
+    "back": "Data Ingestion",
+    "created_at": "2026-08-14 09:33:24"
+  },
+  {
+    "id": "2e851f28",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Progress is slow, consider increasing the number of variants or covering more concepts to speed up material coverage, focus on generating cards for the remaining chunks.",
+    "created_at": "2026-08-14 09:33:24"
+  },
+  {
+    "id": "64e716cc",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Processing",
+    "front": "What are the three major stages of a data pipeline?",
+    "back": "Data ingestion, data processing, and data storage",
+    "created_at": "2026-08-14 09:33:26"
+  },
+  {
+    "id": "7a419ac8",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "The agent has started generating flashcards, but material coverage remains at 0%, so it should continue generating flashcards to cover more chunks of the material.",
+    "created_at": "2026-08-14 09:33:26"
+  },
+  {
+    "id": "3a4c6ffb",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Storage",
+    "front": "What is the final stage of a data pipeline?",
+    "back": "Data Storage",
+    "created_at": "2026-08-14 09:33:29"
+  },
+  {
+    "id": "c685cb0a",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter4",
+    "front": "(reflection note)",
+    "back": "The agent has started generating flashcards, but material coverage remains at 0%, so it should continue generating flashcards to cover more chunks of the material.",
+    "created_at": "2026-08-14 09:33:29"
+  },
+  {
+    "id": "3f7f030e",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter5",
+    "front": "(reflection note)",
+    "back": "The agent needs to use 'generate_flashcards' to address the pending concept 'Data Pipeline' before extracting key concepts from chunk 0.",
+    "created_at": "2026-08-14 09:33:31"
+  },
+  {
+    "id": "e1bdfd1c",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Pipeline",
+    "front": "What is the primary function of a Data Pipeline?",
+    "back": "To process and move data from multiple sources to a destination system, often for analysis, reporting, or storage, in a series of automated steps.",
+    "created_at": "2026-08-14 09:33:38"
+  },
+  {
+    "id": "ea16afcf",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Pipeline",
+    "front": "What is the primary function of a Data Pipeline?",
+    "back": "A Data Pipeline is a series of processes that extract data from multiple sources, transform it into a standardized format, and load it into a target system for analysis or storage.",
+    "created_at": "2026-08-14 09:33:38"
+  },
+  {
+    "id": "0bc90ef7",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter6",
+    "front": "(reflection note)",
+    "back": "You're on track, but remember to review the deck to solidify the knowledge. Next, consider moving on to the next chunk.",
+    "created_at": "2026-08-14 09:33:38"
+  },
+  {
+    "id": "1bd803be",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter7",
+    "front": "(reflection note)",
+    "back": "Review and revise the deck to ensure well-balanced concepts and high-quality questions and answers, focusing on eliminating duplicates and strengthening weak cards.",
+    "created_at": "2026-08-14 09:33:41"
+  },
+  {
+    "id": "cdd1e3df",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter8",
+    "front": "(reflection note)",
+    "back": "The flashcard agent is making good progress, but it's still early in the iteration, so keep revising and refining the cards to ensure they're accurate and helpful.",
+    "created_at": "2026-08-14 09:33:49"
+  },
+  {
+    "id": "d73b6ba1",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter9",
+    "front": "(reflection note)",
+    "back": "The deck review indicates that the current cards need more depth and challenging questions, especially for Data Processing and Data Storage. Consider adding more material chunks or questions to address these areas.",
+    "created_at": "2026-08-14 09:33:57"
+  },
+  {
+    "id": "dd018915",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter10",
+    "front": "(reflection note)",
+    "back": "The agent is making good progress in refining the flashcards, but it's essential to continue reviewing and revising the cards to ensure high-quality material.",
+    "created_at": "2026-08-14 09:34:04"
+  },
+  {
+    "id": "dac381df",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter11",
+    "front": "(reflection note)",
+    "back": "Review and revise the weak cards to make them more specific and detailed, and consider adding more challenging cards to improve the difficulty level of the deck.",
+    "created_at": "2026-08-14 09:34:16"
+  },
+  {
+    "id": "8af6a678",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter12",
+    "front": "(reflection note)",
+    "back": "The agent is making good progress, but it's essential to ensure that all cards are of high quality and provide meaningful information. Next, it should focus on adding more cards to cover the topic comprehensively.",
+    "created_at": "2026-08-14 09:34:20"
+  },
+  {
+    "id": "e3c0c7ac",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter13",
+    "front": "(reflection note)",
+    "back": "Review and improve the weak cards, and consider adding more depth to the questions and answers to make the deck more comprehensive and challenging. Material chunks are covered, but the deck review indicates areas for improvement.",
+    "created_at": "2026-08-14 09:34:32"
+  },
+  {
+    "id": "aff54878",
+    "session_id": "sess_033bc95a",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter14",
+    "front": "(reflection note)",
+    "back": "Good revision of the card, but still 9 cards to go before reviewing the deck; keep revising and adding cards to cover all aspects of Data Engineering.",
+    "created_at": "2026-08-14 09:34:37"
+  },
+  {
+    "id": "5c65f835",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter0",
+    "front": "(reflection note)",
+    "back": "The agent has started extracting key concepts from the material, but it's just beginning and only 0% of the material chunks are covered. Next step: proceed with extracting concepts from the remaining chunks.",
+    "created_at": "2026-08-14 09:54:57"
+  },
+  {
+    "id": "d3fc95d0",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter1",
+    "front": "(reflection note)",
+    "back": "Cannot extract key concepts from chunk 0 due to pending concepts; use 'generate_flashcards' to drain them first.",
+    "created_at": "2026-08-14 09:55:01"
+  },
+  {
+    "id": "a6e01d74",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Engineering",
+    "front": "What is the primary goal of Data Engineering?",
+    "back": "Enabling data-driven decision-making through the collection, processing, storage, and management of data.",
+    "created_at": "2026-08-14 09:56:51"
+  },
+  {
+    "id": "7cef33aa",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter2",
+    "front": "(reflection note)",
+    "back": "Material coverage is at 0% and only 1 card has been generated, indicating a slow start. Consider generating more cards to cover the material and increase coverage.",
+    "created_at": "2026-08-14 09:56:51"
+  },
+  {
+    "id": "2fef1a23",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Ingestion",
+    "front": "What is the primary function of data ingestion in a data pipeline?",
+    "back": "Data ingestion involves collecting data from various sources such as databases, APIs, files, and streaming systems.",
+    "created_at": "2026-08-14 09:56:59"
+  },
+  {
+    "id": "42c69092",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter3",
+    "front": "(reflection note)",
+    "back": "You've started generating flashcards, but you still have a long way to go in terms of material coverage. Consider generating more cards to cover the remaining chunks.",
+    "created_at": "2026-08-14 09:56:59"
+  },
+  {
+    "id": "336a9e38",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Pipeline",
+    "front": "What is the current task or process being worked on in a data pipeline?",
+    "back": "The current chunk to work on, typically denoted by index 0, is the initial task or process being handled in the pipeline.",
+    "created_at": "2026-08-14 09:57:43"
+  },
+  {
+    "id": "ff39ff7a",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter4",
+    "front": "(reflection note)",
+    "back": "You're generating flashcards, but it's slow going - focus on covering material chunks first.",
+    "created_at": "2026-08-14 09:57:43"
+  },
+  {
+    "id": "b6e8512c",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter5",
+    "front": "(reflection note)",
+    "back": "The agent is currently unable to extract key concepts due to pending concepts; consider generating flashcards for the pending concepts first.",
+    "created_at": "2026-08-14 09:58:03"
+  },
+  {
+    "id": "61326a68",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter6",
+    "front": "(reflection note)",
+    "back": "Cannot extract key concepts from chunk 0 due to pending concepts; generate flashcards for the pending concepts first.",
+    "created_at": "2026-08-14 09:58:25"
+  },
+  {
+    "id": "81d7d30a",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Processing",
+    "front": "What is the current focus of data processing?",
+    "back": "The current chunk to work on, typically denoted by index 0.",
+    "created_at": "2026-08-14 09:58:51"
+  },
+  {
+    "id": "3024775b",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter7",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is a good start, but the material coverage is still at 0% and there are only 4 cards so far, so focus on covering more chunks and increasing the card count.",
+    "created_at": "2026-08-14 09:58:51"
+  },
+  {
+    "id": "bd4652ff",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data Storage",
+    "front": "What is the primary function of data storage?",
+    "back": "Data storage is the process of holding and keeping data available for use in a computer, enabling efficient access, retrieval, and manipulation of information, which is crucial for various applications, including software operation, data analysis, and business operations.",
+    "created_at": "2026-08-14 09:59:34"
+  },
+  {
+    "id": "01a026e1",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter8",
+    "front": "(reflection note)",
+    "back": "Generating flashcards for each chunk is going well, but there's still a long way to go in terms of material coverage. Continue generating flashcards for the remaining chunks.",
+    "created_at": "2026-08-14 09:59:34"
+  },
+  {
+    "id": "c2251fb2",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter9",
+    "front": "(reflection note)",
+    "back": "The agent is making good progress, but it's still early in the iteration and material coverage is only 50%, so it should continue extracting key concepts from the remaining chunks.",
+    "created_at": "2026-08-14 09:59:59"
+  },
+  {
+    "id": "a212612f",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter10",
+    "front": "(reflection note)",
+    "back": "You need to generate flashcards for the pending concepts before extracting key concepts from chunk 1. Use 'generate_flashcards' with the pending concepts.",
+    "created_at": "2026-08-14 10:00:20"
+  },
+  {
+    "id": "fc8c7bba",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data is stored in data warehouses, data lakes, or databases.",
+    "front": "Where is data typically stored in a data analytics pipeline?",
+    "back": "Data is stored in data warehouses, data lakes, or databases.",
+    "created_at": "2026-08-14 10:00:49"
+  },
+  {
+    "id": "8725ff6c",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter11",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is going well, but material coverage is still low; continue generating cards for the remaining chunks.",
+    "created_at": "2026-08-14 10:00:49"
+  },
+  {
+    "id": "53677061",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "Data engineering builds reliable and scalable systems.",
+    "front": "What is the primary goal of data engineering?",
+    "back": "Data engineering helps organizations build reliable and scalable systems for analytics, machine learning, and business intelligence.",
+    "created_at": "2026-08-14 10:01:35"
+  },
+  {
+    "id": "a8e38e45",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter12",
+    "front": "(reflection note)",
+    "back": "Generating flashcards is going well, but material coverage is still at 50%, so continue generating cards for the remaining chunks.",
+    "created_at": "2026-08-14 10:01:35"
+  },
+  {
+    "id": "bdb58509",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "ETL stands for Extract, Transform, Load.",
+    "front": "What does ETL stand for in data processing?",
+    "back": "Extract, Transform, Load",
+    "created_at": "2026-08-14 10:02:42"
+  },
+  {
+    "id": "7f769956",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter13",
+    "front": "(reflection note)",
+    "back": "Progress is steady, but material coverage is still low; focus on covering the remaining chunks.",
+    "created_at": "2026-08-14 10:02:42"
+  },
+  {
+    "id": "c33158f3",
+    "session_id": "sess_3ce46f4f",
+    "topic": "Data Engineering is the process of collecting, storing,",
+    "concept": "reflection-iter14",
+    "front": "(reflection note)",
+    "back": "Drain pending concepts by generating flashcards for the existing ones before attempting to extract key concepts from the next chunk.",
+    "created_at": "2026-08-14 10:02:44"
   }
 ]
