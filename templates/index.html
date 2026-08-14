@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashCard Agent — AI-Powered Study Cards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i data-lucide="zap" class="brand-icon"></i>
+            <span class="brand-name">FlashCard Agent</span>
+        </div>
+        <div class="nav-links">
+            <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+                <i data-lucide="layout-dashboard"></i> Dashboard
+            </a>
+            <a href="#generate" class="nav-link" data-tab="generate">
+                <i data-lucide="sparkles"></i> Generate
+            </a>
+            <a href="#logs" class="nav-link" data-tab="logs">
+                <i data-lucide="terminal"></i> Observability Logs
+            </a>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- ============ TAB 1: DASHBOARD ============ -->
+        <section id="tab-dashboard" class="tab-content active">
+            <header class="header">
+                <div class="header-content">
+                    <h1 id="deck-topic">{{ topic }}</h1>
+                    {% if stats %}
+                    {% set thresh_val = stats.score_threshold | default(8.5) %}
+                    <div class="stats">
+                        <span class="stat-badge success">
+                            <i data-lucide="shield-check"></i> {{ stats.passed_count | default(stats.count) }} Approved Cards (≥ {{ thresh_val }})
+                        </span>
+                        <span class="stat-badge">
+                            <i data-lucide="layers"></i> {{ stats.count }} Total Generated
+                        </span>
+                        <span class="stat-badge">
+                            <i data-lucide="refresh-cw"></i> {{ stats.iterations }} Iterations
+                        </span>
+                        {% if stats.completed %}
+                        <span class="stat-badge success">
+                            <i data-lucide="check-circle"></i> Completed
+                        </span>
+                        {% else %}
+                        <span class="stat-badge warning">
+                            <i data-lucide="alert-triangle"></i> {{ stats.stop_reason | default('unknown') }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if flashcards %}
+            <!-- Card Filter Bar -->
+            <div class="deck-filter-bar">
+                <span class="filter-label"><i data-lucide="filter" class="small-icon"></i> Deck View:</span>
+                <div class="filter-pills">
+                    <button class="pill-btn active" id="btn-filter-passed" onclick="filterCards('passed')">
+                        <i data-lucide="check-circle-2" class="small-icon"></i> Judge Approved
+                    </button>
+                    <button class="pill-btn" id="btn-filter-all-cards" onclick="filterCards('all')">
+                        <i data-lucide="layers" class="small-icon"></i> All Generated Cards
+                    </button>
+                </div>
+            </div>
+
+            <div class="flashcard-grid" id="flashcard-grid">
+                {% for card in flashcards %}
+                {% set card_thresh = card.threshold | default(8.5) %}
+                {% set is_passed = (card.passed or card.final_score >= card_thresh) %}
+                <div class="flashcard-container card-item {{ 'passed-card' if is_passed else 'unpassed-card' }}" 
+                     data-passed="{{ 'true' if is_passed else 'false' }}"
+                     style="animation-delay: {{ loop.index0 * 0.08 }}s">
+                    <div class="flashcard">
+                        <div class="card-face card-front">
+                            <div class="card-header">
+                                <span class="difficulty {{ card.difficulty }}">{{ card.difficulty | capitalize }}</span>
+                                {% if is_passed %}
+                                <span class="badge badge-success"><i data-lucide="check-circle" class="small-icon"></i> PASS</span>
+                                {% else %}
+                                <span class="badge badge-warning"><i data-lucide="alert-triangle" class="small-icon"></i> REVISE</span>
+                                {% endif %}
+                                <span class="concept"><i data-lucide="tag" class="small-icon"></i> {{ card.concept }}</span>
+                            </div>
+                            <div class="card-body">
+                                <h2>{{ card.front }}</h2>
+                            </div>
+                            <div class="card-footer">
+                                <span class="click-hint"><i data-lucide="rotate-3d" class="small-icon"></i> Click to flip</span>
+                            </div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-header">
+                                <span class="score-badge">Score: {{ "%.1f"|format(card.final_score) }}/10</span>
+                                {% if card.revision_count > 0 %}
+                                <span class="revision-badge"><i data-lucide="edit-3" class="small-icon"></i> {{ card.revision_count }} revisions</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <p class="answer">{{ card.back }}</p>
+                                {% if card.judge_feedback %}
+                                <div class="feedback-section">
+                                    <p class="feedback-label"><i data-lucide="message-square" class="small-icon"></i> Judge Feedback</p>
+                                    <p class="feedback-text">{{ card.judge_feedback }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <span class="click-hint"><i data-lucide="rotate-3d" class="small-icon"></i> Click to flip back</span>
+                                <button class="btn-trace" onclick="event.stopPropagation(); showActorCriticTrace({{ loop.index0 }})">
+                                    <i data-lucide="git-branch" class="small-icon"></i> Inspect Trace
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Actor-Critic Trace Modal -->
+            <div class="modal-overlay" id="trace-modal-overlay" style="display: none;" onclick="closeTraceModal()">
+                <div class="modal-card" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="git-branch" class="title-icon"></i> Actor-Critic Revision Trace & Rubric</h3>
+                        <button class="btn-close-modal" onclick="closeTraceModal()">&times;</button>
+                    </div>
+                    <div class="modal-body" id="trace-modal-body">
+                        <!-- Dynamic trace content injected via JS -->
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i data-lucide="book-open" class="large-icon"></i>
+                <h2>No flashcards yet</h2>
+                <p>Go to the <strong>Generate</strong> tab and paste your study material to get started!</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- ============ TAB 2: GENERATE ============ -->
+        <section id="tab-generate" class="tab-content">
+
+            <!-- Input Area -->
+            <div class="generate-panel" id="input-panel">
+                <div class="panel-header">
+                    <i data-lucide="file-text" class="panel-icon"></i>
+                    <div>
+                        <h2>Generate Flashcards</h2>
+                        <p class="panel-subtitle">Paste your study material below and let the AI agent create high-quality flashcards.</p>
+                    </div>
+                </div>
+                <form id="generate-form">
+                    <!-- PDF Upload Dropzone -->
+                    <div class="pdf-dropzone" id="pdf-dropzone" onclick="document.getElementById('pdf-file-input').click()">
+                        <input type="file" id="pdf-file-input" name="pdf_file" accept=".pdf,application/pdf" style="display: none;" onchange="handlePdfFileSelect(event)">
+                        <div class="dropzone-content" id="dropzone-prompt">
+                            <i data-lucide="file-up" class="dropzone-icon"></i>
+                            <div class="dropzone-text">
+                                <span class="dropzone-title">Upload a PDF Study Document</span>
+                                <span class="dropzone-sub">Drag & drop your PDF file here or <strong class="text-accent">Click to Browse</strong></span>
+                            </div>
+                        </div>
+                        <div class="pdf-status-pill" id="pdf-status-pill" style="display: none;">
+                            <div class="pdf-info-left">
+                                <i data-lucide="file-text" class="pdf-pill-icon"></i>
+                                <div class="pdf-pill-details">
+                                    <span class="pdf-filename" id="pdf-filename">document.pdf</span>
+                                    <span class="pdf-meta" id="pdf-meta">0 pages • 0 KB</span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-remove-pdf" onclick="event.stopPropagation(); clearPdfSelection()" title="Remove PDF">&times;</button>
+                        </div>
+                    </div>
+
+                    <div class="divider-or"><span>OR PASTE STUDY MATERIAL</span></div>
+
+                    <div class="textarea-wrapper">
+                        <textarea id="material-input" name="material" rows="8"
+                            placeholder="Paste your notes, textbook excerpt, or study material here..."></textarea>
+                        <span class="char-count" id="char-count">0 characters</span>
+                    </div>
+                    <button type="submit" class="btn-generate" id="btn-generate">
+                        <i data-lucide="sparkles"></i>
+                        <span>Start Agent Run</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Agent Run Visualization -->
+            <div class="agent-run-panel" id="agent-run-panel" style="display: none;">
+
+                <!-- Run Header -->
+                <div class="run-header">
+                    <div class="run-header-left">
+                        <div class="run-status-indicator running" id="run-status-indicator">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-dot"></div>
+                        </div>
+                        <div>
+                            <h2 id="run-title">Agent Running…</h2>
+                            <p class="run-subtitle" id="run-subtitle">Initializing…</p>
+                        </div>
+                    </div>
+                    <div class="run-stats-mini">
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-iteration">0</span>
+                            <span class="mini-stat-label">Iteration</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-cards">0</span>
+                            <span class="mini-stat-label">Cards</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-coverage">0%</span>
+                            <span class="mini-stat-label">Coverage</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="stat-tokens">0</span>
+                            <span class="mini-stat-label">Tokens</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Loop Visualization -->
+                <div class="loop-visualizer">
+                    <div class="loop-step" id="loop-perceive">
+                        <div class="loop-step-icon"><i data-lucide="eye"></i></div>
+                        <span class="loop-step-label">Perceive</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-reason">
+                        <div class="loop-step-icon"><i data-lucide="brain"></i></div>
+                        <span class="loop-step-label">Reason</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-act">
+                        <div class="loop-step-icon"><i data-lucide="hammer"></i></div>
+                        <span class="loop-step-label">Act</span>
+                    </div>
+                    <div class="loop-arrow"><i data-lucide="chevron-right"></i></div>
+                    <div class="loop-step" id="loop-reflect">
+                        <div class="loop-step-icon"><i data-lucide="message-circle"></i></div>
+                        <span class="loop-step-label">Reflect</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                    <span class="progress-label" id="progress-label">0% Coverage</span>
+                </div>
+
+                <!-- Live Event Feed -->
+                <div class="event-feed" id="event-feed">
+                    <div class="event-feed-header">
+                        <i data-lucide="activity"></i>
+                        <span>Live Agent Log</span>
+                    </div>
+                    <div class="event-list" id="event-list">
+                        <!-- Events will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Live Cards Preview -->
+                <div class="live-cards-section" id="live-cards-section" style="display:none;">
+                    <h3><i data-lucide="layers" class="small-icon"></i> Cards Generated So Far</h3>
+                    <div class="live-cards-grid" id="live-cards-grid">
+                    </div>
+                </div>
+
+                <!-- Completion Banner -->
+                <div class="completion-banner" id="completion-banner" style="display:none;">
+                    <div class="completion-icon">
+                        <i data-lucide="check-circle-2"></i>
+                    </div>
+                    <h2 id="completion-title">Run Complete!</h2>
+                    <p id="completion-detail"></p>
+                    <button class="btn-generate" onclick="window.location.href='/'">
+                        <i data-lucide="layout-dashboard"></i> View Flashcards
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ TAB 3: OBSERVABILITY LOGS ============ -->
+        <section id="tab-logs" class="tab-content">
+            <header class="header logs-header">
+                <div class="header-content">
+                    <h1><i data-lucide="terminal" class="title-icon"></i> Agent Observability & Log Dashboard</h1>
+                    <p class="panel-subtitle">Inspect per-iteration steps, raw LLM API calls, prompt tokens, retries, and step timing.</p>
+                </div>
+            </header>
+
+            <!-- Logs Toolbar -->
+            <div class="logs-toolbar-card">
+                <div class="toolbar-row top">
+                    <div class="selector-group">
+                        <label for="log-session-select"><i data-lucide="folder-git-2" class="small-icon"></i> Session Log:</label>
+                        <select id="log-session-select" class="log-select">
+                            <option value="">Loading sessions...</option>
+                        </select>
+                    </div>
+
+                    <div class="selector-group">
+                        <label for="log-iter-select"><i data-lucide="repeat" class="small-icon"></i> Iteration:</label>
+                        <select id="log-iter-select" class="log-select">
+                            <option value="all">All Iterations</option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-actions">
+                        <button id="btn-refresh-logs" class="btn-secondary" title="Refresh Logs">
+                            <i data-lucide="refresh-cw"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="toolbar-row bottom">
+                    <!-- Filter Pills -->
+                    <div class="filter-pills" id="step-filter-pills">
+                        <button class="pill-btn active" data-filter="all">All Logs</button>
+                        <button class="pill-btn pill-perceive" data-filter="perceive">Perceive</button>
+                        <button class="pill-btn pill-reason" data-filter="reason">Reason</button>
+                        <button class="pill-btn pill-act" data-filter="act">Act</button>
+                        <button class="pill-btn pill-reflect" data-filter="reflect">Reflect</button>
+                        <button class="pill-btn pill-actor" data-filter="actor">Actor Logs</button>
+                        <button class="pill-btn pill-judge" data-filter="judge">Judge Logs</button>
+                        <button class="pill-btn pill-events" data-filter="events">API & Events</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="search-wrapper">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="log-search-input" placeholder="Search inputs, outputs, errors, tools..." class="log-search-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Judge Reliability & Bias Audit Summary Banner -->
+            <div class="judge-audit-banner" id="judge-audit-banner">
+                <div class="audit-header">
+                    <div class="audit-title">
+                        <i data-lucide="shield-check" class="audit-icon"></i>
+                        <span>LLM-as-a-Judge Empirical Reliability & Bias Validation Metrics</span>
+                    </div>
+                    <span class="badge badge-success">Empirically Audited (N=6 Golden Cards)</span>
+                </div>
+                <div class="audit-metrics-grid">
+                    <div class="audit-metric-item">
+                        <span class="metric-label">Human Alignment (r)</span>
+                        <span class="metric-val text-accent">r = 0.694</span>
+                        <span class="metric-sub">Pearson Correlation (rho=0.714)</span>
+                    </div>
+                    <div class="audit-metric-item">
+                        <span class="metric-label">Mean Absolute Error (MAE)</span>
+                        <span class="metric-val text-amber">1.617 pts</span>
+                        <span class="metric-sub">Human vs LLM Score Delta</span>
+                    </div>
+                    <div class="audit-metric-item">
+                        <span class="metric-label">Verbosity Bias Audit</span>
+                        <span class="metric-val text-amber">Fluff Sensitive</span>
+                        <span class="metric-sub">Mitigated via Max-Token Cap</span>
+                    </div>
+                    <div class="audit-metric-item">
+                        <span class="metric-label">Inter-Judge Variance</span>
+                        <span class="metric-val text-green">σ² = 0.162</span>
+                        <span class="metric-sub">3 Judge Models Consistency</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Stats Header Bar -->
+            <div class="session-stats-bar" id="session-stats-bar" style="display: none;">
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="key" class="small-icon"></i> Session ID</span>
+                    <span class="stat-value" id="lbl-session-id">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="cpu" class="small-icon"></i> Model</span>
+                    <span class="stat-value text-accent" id="lbl-model">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="repeat" class="small-icon"></i> Iterations</span>
+                    <span class="stat-value" id="lbl-iterations">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="zap" class="small-icon"></i> Tokens Used</span>
+                    <span class="stat-value text-amber" id="lbl-tokens">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="alert-circle" class="small-icon"></i> API Retries / Errors</span>
+                    <span class="stat-value" id="lbl-retries-errors">-</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label"><i data-lucide="flag" class="small-icon"></i> Status / Stop</span>
+                    <span class="stat-value" id="lbl-stop-reason">-</span>
+                </div>
+            </div>
+
+            <!-- Log Entries Container -->
+            <div class="log-feed-container" id="log-feed-container">
+                <div class="log-empty-state" id="log-empty-state">
+                    <i data-lucide="file-text" class="large-icon"></i>
+                    <h3>Select a session log to inspect API & iteration details</h3>
+                </div>
+                <div class="log-list" id="log-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        let currentActiveSessionId = null;
+
+        // ============ Tab Switching ============
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab-' + tab).classList.add('active');
+
+                if (tab === 'logs') {
+                    loadLogSessions(currentActiveSessionId);
+                }
+            });
+        });
+
+        // ============ LOG DASHBOARD STATE & FUNCTIONS ============
+        let activeLogRecords = [];
+        let activeSessionSummary = null;
+        let activeFilter = 'all';
+        let activeIterFilter = 'all';
+        let activeSearchQuery = '';
+
+        async function loadLogSessions(autoSelectId = null) {
+            const select = document.getElementById('log-session-select');
+            try {
+                const resp = await fetch('/api/logs');
+                const data = await resp.json();
+                const sessions = data.sessions || [];
+
+                select.innerHTML = '';
+                if (sessions.length === 0) {
+                    select.innerHTML = '<option value="">No log sessions found</option>';
+                    return;
+                }
+
+                sessions.forEach((s, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = s.session_id;
+                    const statusText = s.completed ? `[${s.stop_reason}]` : `[${s.total_iterations} iters]`;
+                    opt.textContent = `${s.formatted_time} — ${s.session_id} ${statusText} (${s.tokens_used.toLocaleString()} tokens)`;
+                    if ((autoSelectId && s.session_id === autoSelectId) || (!autoSelectId && idx === 0)) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+
+                const targetId = select.value;
+                if (targetId) {
+                    loadSessionLogs(targetId);
+                }
+            } catch (err) {
+                console.error('Failed to load log sessions', err);
+            }
+        }
+
+        async function loadSessionLogs(sessionId) {
+            if (!sessionId) return;
+            const logList = document.getElementById('log-list');
+            const emptyState = document.getElementById('log-empty-state');
+            logList.innerHTML = '<div class="log-loading"><i data-lucide="loader" class="spin"></i> Loading session records...</div>';
+            lucide.createIcons();
+
+            try {
+                const resp = await fetch('/api/logs/' + sessionId);
+                const data = await resp.json();
+                if (data.error) {
+                    logList.innerHTML = `<div class="log-error">Error loading logs: ${data.error}</div>`;
+                    return;
+                }
+
+                activeLogRecords = data.records || [];
+                activeSessionSummary = data.summary || null;
+
+                populateIterationFilter(activeLogRecords);
+                updateSessionStatsBar(data);
+                renderLogRecords();
+            } catch (err) {
+                logList.innerHTML = `<div class="log-error">Failed to fetch log details: ${err.message}</div>`;
+            }
+        }
+
+        function populateIterationFilter(records) {
+            const iterSelect = document.getElementById('log-iter-select');
+            const currentVal = iterSelect.value;
+            iterSelect.innerHTML = '<option value="all">All Iterations</option>';
+
+            const iters = new Set();
+            records.forEach(r => {
+                if (r.iteration !== undefined && r.iteration !== null) {
+                    iters.add(r.iteration);
+                }
+            });
+
+            Array.from(iters).sort((a, b) => a - b).forEach(iter => {
+                const opt = document.createElement('option');
+                opt.value = iter;
+                opt.textContent = `Iteration ${iter + 1}`;
+                if (currentVal == iter) opt.selected = true;
+                iterSelect.appendChild(opt);
+            });
+        }
+
+        function updateSessionStatsBar(data) {
+            const bar = document.getElementById('session-stats-bar');
+            bar.style.display = 'grid';
+
+            document.getElementById('lbl-session-id').textContent = data.session_id;
+
+            let model = 'Unknown';
+            let totalIters = 0;
+            let tokens = 0;
+            let retries = 0;
+            let errors = 0;
+            let stopReason = 'in-progress';
+
+            data.records.forEach(r => {
+                if (r.kind === 'session_summary') {
+                    model = r.model || model;
+                    totalIters = r.total_iterations !== undefined ? r.total_iterations : totalIters;
+                    tokens = r.tokens_used || tokens;
+                    stopReason = r.stop_reason || stopReason;
+                } else if (r.kind === 'step') {
+                    if (r.iteration !== undefined) totalIters = Math.max(totalIters, r.iteration + 1);
+                    if (r.error) errors++;
+                } else if (r.kind === 'event') {
+                    if (r.event === 'retry') retries++;
+                    if (r.event === 'token_usage') tokens = r.cumulative || tokens;
+                }
+            });
+
+            document.getElementById('lbl-model').textContent = model;
+            document.getElementById('lbl-iterations').textContent = totalIters;
+            document.getElementById('lbl-tokens').textContent = tokens.toLocaleString();
+            document.getElementById('lbl-retries-errors').textContent = `${retries} retries / ${errors} errs`;
+            
+            const stopEl = document.getElementById('lbl-stop-reason');
+            stopEl.textContent = stopReason;
+            if (stopReason === 'task_complete' || stopReason === 'completed') {
+                stopEl.className = 'stat-value text-green';
+            } else if (stopReason.includes('error') || stopReason.includes('exceeded')) {
+                stopEl.className = 'stat-value text-red';
+            } else {
+                stopEl.className = 'stat-value text-amber';
+            }
+        }
+
+        function renderLogRecords() {
+            const logList = document.getElementById('log-list');
+            const emptyState = document.getElementById('log-empty-state');
+            logList.innerHTML = '';
+
+            if (!activeLogRecords || activeLogRecords.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            const searchLower = activeSearchQuery.toLowerCase();
+
+            const filtered = activeLogRecords.filter(r => {
+                if (activeIterFilter !== 'all') {
+                    if (r.iteration === undefined || r.iteration != activeIterFilter) {
+                        return false;
+                    }
+                }
+
+                if (activeFilter !== 'all') {
+                    if (activeFilter === 'events') {
+                        if (r.kind !== 'event' && r.kind !== 'session_summary' && r.kind !== 'iteration_start' && r.kind !== 'iteration_end') {
+                            return false;
+                        }
+                    } else if (activeFilter === 'actor') {
+                        if (r.role !== 'actor' && r.kind !== 'actor_output' && r.kind !== 'revision_applied') {
+                            return false;
+                        }
+                    } else if (activeFilter === 'judge') {
+                        if (r.role !== 'judge' && r.kind !== 'judge_output') {
+                            return false;
+                        }
+                    } else {
+                        if (r.step !== activeFilter) {
+                            return false;
+                        }
+                    }
+                }
+
+                if (searchLower) {
+                    const str = JSON.stringify(r).toLowerCase();
+                    if (!str.includes(searchLower)) return false;
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                logList.innerHTML = '<div class="log-empty-search"><i data-lucide="search-x"></i> No logs match the selected filters.</div>';
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach((r, index) => {
+                const card = createLogRecordCard(r, index);
+                logList.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function createLogRecordCard(r, index) {
+            const card = document.createElement('div');
+            const kind = r.kind || 'step';
+            const step = r.step || r.event || 'record';
+            
+            let colorClass = 'card-default';
+            if (kind === 'step') {
+                colorClass = `card-step-${step}`;
+            } else if (kind === 'event') {
+                colorClass = step === 'retry' ? 'card-event-retry' : 'card-event-info';
+            } else if (kind === 'session_summary') {
+                colorClass = 'card-summary';
+            } else if (kind.startsWith('iteration')) {
+                colorClass = 'card-iteration-divider';
+            }
+
+            card.className = `log-card ${colorClass} animate-in`;
+
+            const ts = r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : '';
+
+            let statusBadge = '';
+            if (r.error) {
+                statusBadge = `<span class="badge badge-error"><i data-lucide="x-circle"></i> ERROR</span>`;
+            } else if (r.kind === 'step') {
+                statusBadge = `<span class="badge badge-success"><i data-lucide="check"></i> OK</span>`;
+            } else if (r.event === 'retry') {
+                statusBadge = `<span class="badge badge-warning"><i data-lucide="alert-triangle"></i> RETRY</span>`;
+            }
+
+            let iterBadge = r.iteration !== undefined ? `<span class="badge badge-iter">Iter ${r.iteration + 1}</span>` : '';
+            let durationBadge = r.duration_ms !== undefined ? `<span class="badge badge-time"><i data-lucide="clock"></i> ${r.duration_ms} ms</span>` : '';
+            if (r.duration_s !== undefined) durationBadge = `<span class="badge badge-time"><i data-lucide="clock"></i> ${r.duration_s}s</span>`;
+
+            let stepTitle = capitalize(step);
+            if (kind === 'iteration_start') stepTitle = `Iteration ${r.iteration + 1} Start`;
+            if (kind === 'iteration_end') stepTitle = `Iteration ${r.iteration + 1} Complete`;
+            if (kind === 'session_summary') stepTitle = `Session Summary`;
+
+            let previewText = '';
+            if (kind === 'step') {
+                if (step === 'perceive') previewText = 'Material perceived & chunked.';
+                else if (step === 'reason') previewText = r.output ? `Action: ${r.output}` : 'Reasoned next action.';
+                else if (step === 'act') previewText = r.output || (r.input ? `Input: ${r.input}` : 'Performed action.');
+                else if (step === 'reflect') previewText = r.output || 'Reflection captured.';
+            } else if (kind === 'event') {
+                if (r.event === 'retry') previewText = `Retry attempt ${r.attempt}/${r.max_retries} (${r.delay_s}s delay) — Error: ${r.error}`;
+                else if (r.event === 'token_usage') previewText = `Token Usage: +${r.used_this_call} tokens (Total: ${r.cumulative}/${r.budget})`;
+                else previewText = JSON.stringify(r);
+            } else if (kind === 'session_summary') {
+                previewText = `Stopped: ${r.stop_reason} | ${r.total_cards} cards | ${r.tokens_used} tokens | ${r.duration_s}s`;
+            } else if (kind === 'iteration_end') {
+                previewText = `Cards created: ${r.cards_so_far} | Tokens used: ${r.tokens_used}/${r.token_budget}`;
+            } else if (kind === 'judge_output') {
+                const passedText = r.passed ? 'PASS' : 'REVISE';
+                const thresh = r.threshold !== undefined ? r.threshold : 8.5;
+                const calcScore = r.score !== undefined ? (typeof r.score === 'number' ? r.score.toFixed(1) : r.score) : '?';
+                stepTitle = `Judge Evaluation (${passedText} | Score: ${calcScore}/10 | Threshold: ${thresh})`;
+                const s = r.scores || {};
+                previewText = `Calculated Score: ${calcScore}/10 (Threshold: ${thresh}) | Sub-Scores: Acc=${s.accuracy}, Rel=${s.relevance}, Cla=${s.clarity}, Com=${s.completeness || '-'}, Ped=${s.pedagogical_value || '-'}, Con=${s['atomicity/conciseness'] || s.conciseness} | Feedback: ${r.feedback}`;
+            }
+
+            const rawJsonId = `json-raw-${index}`;
+
+            card.innerHTML = `
+                <div class="log-card-header">
+                    <div class="log-card-title-group">
+                        <span class="log-kind-badge kind-${kind}">${kind.toUpperCase()}</span>
+                        <h4 class="log-step-title">${stepTitle}</h4>
+                        ${iterBadge}
+                        ${statusBadge}
+                    </div>
+                    <div class="log-card-meta">
+                        ${durationBadge}
+                        <span class="log-timestamp">${ts}</span>
+                    </div>
+                </div>
+                
+                <div class="log-card-body">
+                    <div class="log-preview-text">${escapeHtml(previewText)}</div>
+                    ${r.error ? `<div class="log-error-box"><i data-lucide="alert-octagon"></i> ${escapeHtml(r.error)}</div>` : ''}
+                </div>
+
+                <div class="log-card-footer">
+                    <button class="btn-toggle-json" onclick="toggleJsonView('${rawJsonId}', this)">
+                        <i data-lucide="code"></i> Show Full Record JSON
+                    </button>
+                </div>
+
+                <div class="log-json-drawer" id="${rawJsonId}" style="display: none;">
+                    <pre><code>${escapeHtml(JSON.stringify(r, null, 2))}</code></pre>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function toggleJsonView(id, btn) {
+            const drawer = document.getElementById(id);
+            if (drawer.style.display === 'none') {
+                drawer.style.display = 'block';
+                btn.innerHTML = '<i data-lucide="eye-off"></i> Hide JSON';
+            } else {
+                drawer.style.display = 'none';
+                btn.innerHTML = '<i data-lucide="code"></i> Show Full Record JSON';
+            }
+            lucide.createIcons();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            if (typeof str !== 'string') str = JSON.stringify(str);
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        // Dashboard Event Listeners
+        document.getElementById('log-session-select').addEventListener('change', function() {
+            loadSessionLogs(this.value);
+        });
+
+        document.getElementById('log-iter-select').addEventListener('change', function() {
+            activeIterFilter = this.value;
+            renderLogRecords();
+        });
+
+        document.getElementById('btn-refresh-logs').addEventListener('click', function() {
+            const sel = document.getElementById('log-session-select').value;
+            if (sel) loadSessionLogs(sel);
+            else loadLogSessions();
+        });
+
+        document.getElementById('step-filter-pills').addEventListener('click', function(e) {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            document.querySelectorAll('#step-filter-pills .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            renderLogRecords();
+        });
+
+        document.getElementById('log-search-input').addEventListener('input', function() {
+            activeSearchQuery = this.value.trim();
+            renderLogRecords();
+        });
+
+        // Initial fetch when page loads if on logs tab
+        if (window.location.hash === '#logs') {
+            loadLogSessions();
+        }
+
+        // ============ Card Flipping ============
+        document.querySelectorAll('.flashcard-container').forEach(container => {
+            container.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-trace')) return;
+                const selection = window.getSelection();
+                if (selection && selection.toString().length > 0) return;
+                this.querySelector('.flashcard').classList.toggle('is-flipped');
+            });
+        });
+
+        // ============ PDF Upload & Drag-and-Drop Handler ============
+        let selectedPdfFile = null;
+
+        async function handlePdfFileSelect(event) {
+            const files = event.target.files || (event.dataTransfer && event.dataTransfer.files);
+            if (!files || files.length === 0) return;
+
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                alert('Please select a valid PDF file.');
+                return;
+            }
+
+            selectedPdfFile = file;
+            document.getElementById('dropzone-prompt').style.display = 'none';
+            document.getElementById('pdf-status-pill').style.display = 'flex';
+            document.getElementById('pdf-filename').textContent = file.name;
+            document.getElementById('pdf-meta').textContent = `Extracting text... (${(file.size / 1024).toFixed(1)} KB)`;
+
+            // Extract text from PDF via API
+            const pdfData = new FormData();
+            pdfData.append('pdf_file', file);
+
+            try {
+                const resp = await fetch('/api/extract-pdf', { method: 'POST', body: pdfData });
+                const data = await resp.json();
+                if (data.error) {
+                    alert('PDF Extraction Error: ' + data.error);
+                    clearPdfSelection();
+                    return;
+                }
+
+                document.getElementById('pdf-meta').textContent = `${data.pages} pages · ${data.word_count.toLocaleString()} words`;
+                document.getElementById('material-input').value = data.text;
+                document.getElementById('char-count').textContent = data.char_count.toLocaleString() + ' characters';
+            } catch (err) {
+                alert('Failed to extract PDF: ' + err.message);
+                clearPdfSelection();
+            }
+        }
+
+        function clearPdfSelection() {
+            selectedPdfFile = null;
+            document.getElementById('pdf-file-input').value = '';
+            document.getElementById('dropzone-prompt').style.display = 'flex';
+            document.getElementById('pdf-status-pill').style.display = 'none';
+        }
+
+        // Setup Dropzone Drag-and-Drop
+        const dropzone = document.getElementById('pdf-dropzone');
+        if (dropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('drag-active');
+                }, false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('drag-active');
+                }, false);
+            });
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length > 0) {
+                    handlePdfFileSelect({ target: { files: dt.files } });
+                }
+            });
+        }
+
+        // ============ Character Counter ============
+        const materialInput = document.getElementById('material-input');
+        const charCount = document.getElementById('char-count');
+        materialInput.addEventListener('input', () => {
+            charCount.textContent = materialInput.value.length + ' characters';
+        });
+
+        // ============ Agent Run Logic ============
+        const form = document.getElementById('generate-form');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const material = materialInput.value.trim();
+            if (!material && !selectedPdfFile) {
+                alert('Please paste study material or select a PDF file.');
+                return;
+            }
+
+            document.getElementById('input-panel').style.display = 'none';
+            document.getElementById('agent-run-panel').style.display = 'block';
+
+            const formData = new FormData();
+            if (material) {
+                formData.append('material', material);
+            }
+            if (selectedPdfFile) {
+                formData.append('pdf_file', selectedPdfFile);
+            }
+
+            try {
+                const resp = await fetch('/run', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                connectSSE(data.run_id);
+            } catch (err) {
+                addEvent('error', 'Failed to start the agent run: ' + err.message);
+            }
+        });
+
+        function connectSSE(runId) {
+            const evtSource = new EventSource('/stream/' + runId);
+            evtSource.onmessage = function(e) {
+                const event = JSON.parse(e.data);
+                handleEvent(event);
+                if (event.type === 'stream_end') {
+                    evtSource.close();
+                }
+            };
+            evtSource.onerror = function() {
+                addEvent('error', 'SSE connection lost.');
+                evtSource.close();
+            };
+        }
+
+        function handleEvent(event) {
+            const t = event.type;
+
+            if (t === 'run_start') {
+                currentActiveSessionId = event.session_id || null;
+                document.getElementById('run-subtitle').textContent =
+                    `Model: ${event.model} · Max Iterations: ${event.max_iterations} · Token Budget: ${event.token_budget.toLocaleString()}`;
+                addEvent('system', `🚀 Agent started — session=${event.session_id || 'new'}, model=${event.model}, budget=${event.token_budget.toLocaleString()} tokens`);
+            }
+
+            else if (t === 'perceive') {
+                highlightStep('perceive');
+                document.getElementById('run-subtitle').textContent =
+                    `Topic: "${event.topic}" — ${event.total_chunks} chunks, ${event.total_words} words`;
+                addEvent('perceive', `📖 Perceived material: "${event.topic}" — ${event.total_chunks} chunks, ${event.total_words} words`);
+            }
+
+            else if (t === 'step_start') {
+                highlightStep(event.step);
+            }
+
+            else if (t === 'reason') {
+                highlightStep('reason');
+                document.getElementById('stat-iteration').textContent = event.iteration + 1;
+                const argsStr = event.action_input ? JSON.stringify(event.action_input) : '{}';
+                addEvent('reason', `🧠 Iteration ${event.iteration + 1}: chose <span class="event-action">${event.action_name}</span> ${argsStr}`);
+            }
+
+            else if (t === 'act') {
+                highlightStep('act');
+                document.getElementById('stat-cards').textContent = event.total_cards;
+                addEvent('act', `⚡ ${event.observation}`);
+
+                if (event.new_cards && event.new_cards.length > 0) {
+                    document.getElementById('live-cards-section').style.display = 'block';
+                    const grid = document.getElementById('live-cards-grid');
+                    event.new_cards.forEach(card => {
+                        const el = document.createElement('div');
+                        el.className = 'live-card animate-in';
+                        el.innerHTML = `
+                            <div class="live-card-header">
+                                <span class="difficulty ${card.difficulty}">${capitalize(card.difficulty)}</span>
+                                <span class="score-badge">Score: ${card.final_score.toFixed(1)}/10</span>
+                            </div>
+                            <p class="live-card-q">${card.front}</p>
+                            <p class="live-card-a">${card.back}</p>
+                        `;
+                        grid.appendChild(el);
+                    });
+                }
+            }
+
+            else if (t === 'reflect') {
+                highlightStep('reflect');
+                const covPct = (event.coverage * 100).toFixed(0);
+                document.getElementById('stat-coverage').textContent = covPct + '%';
+                document.getElementById('stat-tokens').textContent = event.tokens_used.toLocaleString();
+                document.getElementById('stat-cards').textContent = event.total_cards;
+
+                document.getElementById('progress-bar').style.width = covPct + '%';
+                document.getElementById('progress-label').textContent = covPct + '% Coverage';
+
+                addEvent('reflect', `💭 ${event.note}`);
+                if (event.done) {
+                    addEvent('system', '✅ Agent marked the task as done.');
+                }
+            }
+
+            else if (t === 'run_complete') {
+                clearStepHighlights();
+                document.getElementById('run-status-indicator').className = 'run-status-indicator done';
+                document.getElementById('run-title').textContent = 'Run Complete!';
+
+                document.getElementById('completion-banner').style.display = 'flex';
+                document.getElementById('completion-title').textContent =
+                    event.stop_reason === 'task_complete' ? '✅ Agent Completed Successfully!' : `⚠️ Stopped: ${event.stop_reason}`;
+                document.getElementById('completion-detail').textContent =
+                    `${event.total_cards} cards generated in ${event.iterations} iterations using ${event.tokens_used.toLocaleString()} tokens.`;
+
+                addEvent('system', `🏁 Run finished: ${event.stop_reason} — ${event.total_cards} cards, ${event.iterations} iters, ${event.tokens_used.toLocaleString()} tokens`);
+                lucide.createIcons();
+            }
+
+            else if (t === 'run_error') {
+                document.getElementById('run-status-indicator').className = 'run-status-indicator error';
+                document.getElementById('run-title').textContent = 'Run Failed';
+                addEvent('error', `❌ Error: ${event.error}`);
+            }
+        }
+
+        function highlightStep(stepName) {
+            document.querySelectorAll('.loop-step').forEach(el => el.classList.remove('active'));
+            const el = document.getElementById('loop-' + stepName);
+            if (el) el.classList.add('active');
+        }
+
+        function clearStepHighlights() {
+            document.querySelectorAll('.loop-step').forEach(el => el.classList.remove('active'));
+        }
+
+        function addEvent(type, html) {
+            const list = document.getElementById('event-list');
+            const el = document.createElement('div');
+            el.className = 'event-item event-' + type + ' animate-in';
+
+            const time = new Date().toLocaleTimeString();
+            el.innerHTML = `<span class="event-time">${time}</span> <span class="event-text">${html}</span>`;
+            list.appendChild(el);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function filterCards(mode) {
+            const btnPassed = document.getElementById('btn-filter-passed');
+            const btnAll = document.getElementById('btn-filter-all-cards');
+            const items = document.querySelectorAll('.card-item');
+
+            if (mode === 'passed') {
+                if (btnPassed) btnPassed.classList.add('active');
+                if (btnAll) btnAll.classList.remove('active');
+                items.forEach(el => {
+                    const isPassed = el.getAttribute('data-passed') === 'true';
+                    el.style.display = isPassed ? 'block' : 'none';
+                });
+            } else {
+                if (btnAll) btnAll.classList.add('active');
+                if (btnPassed) btnPassed.classList.remove('active');
+                items.forEach(el => {
+                    el.style.display = 'block';
+                });
+            }
+        }
+
+        // Apply initial filter (default to passed cards)
+        document.addEventListener('DOMContentLoaded', () => {
+            filterCards('passed');
+        });
+
+        const allFlashcardsData = {{ flashcards | tojson }};
+
+        function showActorCriticTrace(index) {
+            const card = allFlashcardsData[index];
+            if (!card) return;
+
+            const modalBody = document.getElementById('trace-modal-body');
+            let html = `
+                <div class="trace-summary">
+                    <h4>Concept: <span class="text-accent">${escapeHtml(card.concept)}</span></h4>
+                    <div class="trace-badges">
+                        <span class="badge badge-success">Final Score: ${(card.final_score || 0).toFixed(1)}/10</span>
+                        <span class="badge badge-iter">${card.revision_count || 0} Revisions</span>
+                        <span class="badge badge-time">Actor: ${escapeHtml(card.actor_model || 'Groq')}</span>
+                        <span class="badge badge-time">Judge: ${escapeHtml(card.judge_model || 'Groq')}</span>
+                    </div>
+                </div>
+                <div class="trace-timeline">
+            `;
+
+            const versions = card.versions || [];
+            if (versions.length === 0) {
+                html += `
+                    <div class="trace-step pass-step">
+                        <div class="step-header">
+                            <span class="step-title">Initial Draft (Direct Approved)</span>
+                        </div>
+                        <div class="draft-box">
+                            <p><strong>Front:</strong> ${escapeHtml(card.front)}</p>
+                            <p><strong>Back:</strong> ${escapeHtml(card.back)}</p>
+                        </div>
+                        <div class="feedback-box">
+                            <p><strong>Judge Feedback:</strong> ${escapeHtml(card.judge_feedback || 'No revisions required.')}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                versions.forEach((v, idx) => {
+                    const draft = v.draft || {};
+                    const evalRes = v.judge_evaluation || {};
+                    const passed = evalRes.pass;
+                    const thresh = evalRes.threshold !== undefined ? evalRes.threshold : 8.5;
+                    html += `
+                        <div class="trace-step ${passed ? 'pass-step' : 'revise-step'}">
+                            <div class="step-header">
+                                <span class="step-title">Iteration #${idx + 1} (${passed ? `PASSED ${thresh}+ THRESHOLD` : 'REVISE REQUIRED'})</span>
+                                <span class="score-badge">Weighted Score: ${(evalRes.score || 0).toFixed(1)}/10</span>
+                            </div>
+                            <div class="draft-box">
+                                <p class="draft-label"><i data-lucide="bot"></i> Actor Output (Rev ${idx}):</p>
+                                <p class="front-text"><strong>Q:</strong> ${escapeHtml(draft.front)}</p>
+                                <p class="back-text"><strong>A:</strong> ${escapeHtml(draft.back)}</p>
+                            </div>
+                            <div class="rubric-section">
+                                <p class="rubric-label"><i data-lucide="scale"></i> Independent Judge 6-Dimension Rubric Breakdown:</p>
+                                <div class="rubric-grid">
+                                    <div class="rubric-item"><span>Accuracy (25%)</span> <strong>${evalRes.accuracy || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Relevance (15%)</span> <strong>${evalRes.relevance || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Clarity (15%)</span> <strong>${evalRes.clarity || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Completeness (20%)</span> <strong>${evalRes.completeness || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Pedagogical Value (15%)</span> <strong>${evalRes.pedagogical_value || 0}/10</strong></div>
+                                    <div class="rubric-item"><span>Conciseness/Atomicity (10%)</span> <strong>${evalRes.conciseness || 0}/10</strong></div>
+                                </div>
+                            </div>
+                            <div class="feedback-box">
+                                <p><strong>Judge Feedback:</strong> ${escapeHtml(evalRes.feedback || 'None')}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            modalBody.innerHTML = html;
+            document.getElementById('trace-modal-overlay').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeTraceModal() {
+            document.getElementById('trace-modal-overlay').style.display = 'none';
+        }
+
+        function capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+    </script>
+</body>
+</html>

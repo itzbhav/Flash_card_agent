@@ -1,0 +1,20 @@
+{
+  "baseline": {
+    "card_count": 8,
+    "avg_accuracy": 9.625,
+    "avg_clarity": 9.375,
+    "avg_atomicity": 9.5,
+    "overall_score": 9.541666666666666,
+    "pass_rate_pct": 100.0,
+    "execution_time_s": 17.89
+  },
+  "actor_critic_agent": {
+    "card_count": 6,
+    "avg_accuracy": 9.166666666666666,
+    "avg_clarity": 9.333333333333334,
+    "avg_atomicity": 9.5,
+    "overall_score": 9.347777777777777,
+    "pass_rate_pct": 100.0,
+    "execution_time_s": 985.89
+  }
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 import cognition
 from models import AgentState
@@ -86,8 +87,13 @@ def run_agent(material: str,
         print("FLASHCARD AGENT - starting")
         print("=" * 56)
 
+    session_start = time.perf_counter()
+
     try:
         while not state.done and state.iteration < state.max_iterations:
+            # ── iteration start ──
+            logger.iteration_start(state.iteration, state.max_iterations)
+
             with logger.step("perceive", state.iteration):
                 state = cognition.perceive(state)
 
@@ -113,6 +119,12 @@ def run_agent(material: str,
             if verbose:
                 _log_iteration(state)
 
+            # ── iteration end ──
+            tokens_used = harness.tokens_used if harness else 0
+            token_budget = config.guardrails.token_budget
+            logger.iteration_end(state.iteration, len(state.flashcards),
+                                 tokens_used, token_budget)
+
             state.iteration += 1
 
         # GUARDRAIL: hard iteration cap -- the while condition above is the
@@ -129,16 +141,24 @@ def run_agent(material: str,
         state.stop_reason = "stuck_loop_detected"
         logger.event("guardrail_stop", reason="stuck_loop_detected", detail=str(e))
 
+    # ---- session summary (last log record) -----------------------------------
+    session_duration = time.perf_counter() - session_start
+    logger.session_summary(
+        total_iterations=state.iteration,
+        max_iterations=state.max_iterations,
+        total_cards=len(state.flashcards),
+        tokens_used=harness.tokens_used,
+        token_budget=config.guardrails.token_budget,
+        stop_reason=state.stop_reason,
+        model=config.model,
+        duration_s=session_duration,
+    )
+
     # ---- termination report -------------------------------------------------
     if verbose:
-        print("\n" + "=" * 56)
-        print(f"FINISHED (stop_reason={state.stop_reason}) after "
-              f"{state.iteration} iterations with {len(state.flashcards)} cards.")
-        print(f"Tokens used: {harness.tokens_used} / {config.guardrails.token_budget}")
-        print(f"Memory store now has {state.memory.count()} record(s) total "
+        print(f"\nMemory store now has {state.memory.count()} record(s) total "
               f"(persists to {state.memory.path}).")
         print(f"Structured log: {logger.path}")
-        print("=" * 56)
 
     logger.close()
     return state

@@ -10,7 +10,7 @@ Usage:
     python test_setup.py
 """
 
-from llm import call_llm, extract_text, MODEL
+from llm import call_llm, extract_text, _default_model
 from tools import handle_extract_key_concepts, handle_generate_flashcards
 
 SAMPLE = (
@@ -22,7 +22,7 @@ SAMPLE = (
 
 
 def check_connection():
-    print(f"[1/3] Pinging model '{MODEL}' ...")
+    print(f"[1/3] Pinging model '{_default_model()}' ...")
     resp = call_llm(
         system="You are a test. Reply with exactly the word: OK",
         messages=[{"role": "user", "content": "ping"}],

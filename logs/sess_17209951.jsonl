@@ -1,0 +1,2 @@
+{"kind": "iteration_start", "iteration": 0, "max_iterations": 15, "timestamp": "2026-08-13T17:21:50.543302+00:00", "session_id": "sess_17209951"}
+{"kind": "step", "step": "perceive", "iteration": 0, "output": "null", "error": null, "duration_ms": 0.6, "input": "null", "timestamp": "2026-08-13T17:21:50.545333+00:00", "session_id": "sess_17209951"}

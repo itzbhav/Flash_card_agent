@@ -17,6 +17,13 @@ class Flashcard:
     concept: str                   # which concept this card tests
     difficulty: str = "medium"     # easy | medium | hard
     source: str = ""               # snippet of source text it was derived from
+    versions: list[dict] = field(default_factory=list) # history of drafts and their judge evaluations
+    revision_count: int = 0        # number of revisions
+    final_score: float = 0.0       # score from the judge
+    judge_feedback: str = ""       # final feedback from the judge
+    actor_model: str = ""          # model used to generate/revise
+    judge_model: str = ""          # model used to score
+    passed: bool = True            # whether the card passed the Judge 8.5+ threshold
  
     def to_dict(self) -> dict:
         return asdict(self)
